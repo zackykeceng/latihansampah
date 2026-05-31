@@ -505,7 +505,16 @@ function showDetail(filteredIdx) {
             ${row('fa-user',         'Pelapor',   l.nama      || 'Anonim')}
             ${row('fa-phone',        'Kontak',    l.kontak    || '—')}
             ${row('fa-circle-info',  'Status',    getStatusText(l.status))}
-            ${l.foto ? `<img src="${escAttr(l.foto)}" alt="Dokumentasi" class="modal-photo">` : ''}
+            ${l.foto ? `
+            <div class="modal-row">
+                <div class="modal-row-label"><i class="fas fa-image" style="color:var(--green-base)"></i>Foto</div>
+                <div class="modal-row-value">
+                    <img src="${escAttr(getDriveImgUrl(l.foto))}"
+                         alt="Dokumentasi"
+                         class="modal-photo"
+                         onerror="this.closest('.modal-row').innerHTML='<div class=\\'modal-row-label\\'><i class=\\'fas fa-image\\' style=\\'color:var(--green-base)\\'></i>Foto</div><div class=\\'modal-row-value\\' style=\\'color:var(--text-muted);font-size:13px;\\'>Foto tidak dapat dimuat. <a href=\\'${escAttr(l.foto)}\\' target=\\'_blank\\' style=\\'color:var(--green-base)\\'>Buka di Drive →</a></div>'">
+                </div>
+            </div>` : ''}
             <button class="modal-btn-close" onclick="this.closest('.modal-overlay').remove()">
                 <i class="fas fa-xmark"></i> Tutup
             </button>
@@ -602,6 +611,47 @@ function exportToCSV() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast(`Berhasil mengekspor ${allLaporan.length} data`, 'success');
+}
+
+// ==================== GOOGLE DRIVE PHOTO ====================
+/**
+ * Converts any Google Drive share/view URL or raw file ID into a direct
+ * thumbnail URL that can be used as <img src="...">.
+ *
+ * Supported input formats:
+ *   - Full share URL : https://drive.google.com/file/d/FILE_ID/view?...
+ *   - Open URL       : https://drive.google.com/open?id=FILE_ID
+ *   - uc URL         : https://drive.google.com/uc?id=FILE_ID&export=view
+ *   - Raw file ID    : 1_nT3ECrXKGe_0nOwlaRds54ueV_mNwn6
+ */
+function getDriveImgUrl(input) {
+    if (!input) return '';
+    let fileId = '';
+
+    // Already a direct lh3.googleusercontent.com or other embeddable URL
+    if (/^https?:\/\/lh3\.googleusercontent\.com/.test(input)) return input;
+
+    // Extract file ID from various Drive URL patterns
+    const patterns = [
+        /\/file\/d\/([a-zA-Z0-9_-]+)/,          // /file/d/ID
+        /[?&]id=([a-zA-Z0-9_-]+)/,               // ?id=ID or &id=ID
+        /\/d\/([a-zA-Z0-9_-]+)/                   // /d/ID fallback
+    ];
+    for (const re of patterns) {
+        const m = input.match(re);
+        if (m) { fileId = m[1]; break; }
+    }
+
+    // If no pattern matched, treat the whole string as a raw file ID
+    if (!fileId) {
+        // Bare file IDs are typically 25–50 alphanumeric/_/- chars, no spaces
+        if (/^[a-zA-Z0-9_-]{10,}$/.test(input.trim())) {
+            fileId = input.trim();
+        }
+    }
+
+    if (!fileId) return input; // return as-is; let the browser handle it
+    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
 }
 
 // ==================== HELPERS ====================
