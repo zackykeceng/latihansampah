@@ -1,1 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin DLH — Laporan Sampah Bojonegoro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
 
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="login-container">
+    <div class="login-bg-orbs">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+    </div>
+    <div class="login-card">
+        <div class="login-brand">
+            <div class="login-icon">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="login-brand-text">
+                <span class="brand-main">DLH</span>
+                <span class="brand-sub">Bojonegoro</span>
+            </div>
+        </div>
+        <h2>Selamat Datang</h2>
+        <p>Masuk ke panel admin pengelolaan laporan sampah</p>
+        <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="passwordInput" class="login-input"
+                   placeholder="Kata sandi admin"
+                   onkeypress="if(event.key==='Enter') login()">
+            <button class="pw-toggle" onclick="togglePassword()" tabindex="-1">
+                <i class="fas fa-eye" id="pwEyeIcon"></i>
+            </button>
+        </div>
+        <button onclick="login()" class="login-btn">
+            <span>Masuk</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>
+        <!-- BUG FIX: removed duplicate display:none inline style; visibility is controlled by .visible class -->
+        <div id="loginError" class="login-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="loginErrorMsg">Password salah!</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="adminPanel" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon"><i class="fas fa-leaf"></i></div>
+                <div>
+                    <div class="sidebar-logo-name">DLH<span>Bojonegoro</span></div>
+                    <div class="sidebar-logo-tagline">Panel Admin</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group-label">Menu</div>
+            <div class="nav-item active" data-page="dashboard">
+                <div class="nav-icon"><i class="fas fa-gauge-high"></i></div>
+                <span>Dashboard</span>
+                <div class="nav-indicator"></div>
+            </div>
+            <div class="nav-item" data-page="laporan">
+                <div class="nav-icon"><i class="fas fa-clipboard-list"></i></div>
+                <span>Daftar Laporan</span>
+                <div class="nav-indicator"></div>
+            </div>
+            <div class="nav-item" data-page="statistik">
+                <div class="nav-icon"><i class="fas fa-chart-pie"></i></div>
+                <span>Statistik</span>
+                <div class="nav-indicator"></div>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-admin-info">
+                <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
+                <div>
+                    <div class="admin-name">Administrator</div>
+                    <div class="admin-role">DLH Bojonegoro</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <div class="header-breadcrumb" id="headerBreadcrumb">
+                    <i class="fas fa-gauge-high"></i> Dashboard
+                </div>
+                <h1 class="header-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-refresh" id="refreshBtn" onclick="loadData()" title="Refresh data">
+                    <i class="fas fa-rotate-right" id="refreshIcon"></i>
+                </div>
+                <div class="header-datetime">
+                    <div class="header-time" id="currentTime">00:00</div>
+                    <div class="header-date" id="currentDate">Memuat...</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <div id="dashboardPage" class="page active">
+
+            <!-- Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-meta">
+                        <div class="stat-label">Total Laporan</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-inbox"></i></div>
+                    </div>
+                    <div class="stat-number" id="totalLaporan">—</div>
+                    <div class="stat-footer">Seluruh data masuk</div>
+                </div>
+                <div class="stat-card stat-waiting">
+                    <div class="stat-meta">
+                        <div class="stat-label">Menunggu</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-hourglass-half"></i></div>
+                    </div>
+                    <div class="stat-number" id="menungguLaporan">—</div>
+                    <div class="stat-footer">Perlu ditindaklanjuti</div>
+                </div>
+                <div class="stat-card stat-proses">
+                    <div class="stat-meta">
+                        <div class="stat-label">Diproses</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-gears"></i></div>
+                    </div>
+                    <div class="stat-number" id="diprosesLaporan">—</div>
+                    <div class="stat-footer">Sedang ditangani</div>
+                </div>
+                <div class="stat-card stat-done">
+                    <div class="stat-meta">
+                        <div class="stat-label">Selesai</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-circle-check"></i></div>
+                    </div>
+                    <div class="stat-number" id="selesaiLaporan">—</div>
+                    <div class="stat-footer">Telah ditangani</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Laporan per Kecamatan</h3>
+                        <span class="chart-badge"><i class="fas fa-map-location-dot"></i> Wilayah</span>
+                    </div>
+                    <canvas id="kecamatanChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Sebaran Kategori</h3>
+                        <span class="chart-badge"><i class="fas fa-layer-group"></i> Jenis</span>
+                    </div>
+                    <canvas id="kategoriChart"></canvas>
+                </div>
+                <div class="chart-card chart-full">
+                    <div class="chart-header">
+                        <h3>Tren 7 Hari Terakhir</h3>
+                        <span class="chart-badge"><i class="fas fa-chart-line"></i> Harian</span>
+                    </div>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LAPORAN PAGE ===== -->
+        <div id="laporanPage" class="page">
+            <div class="filter-bar">
+                <div class="search-wrap">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Cari pelapor, lokasi, deskripsi…">
+                    <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:none;">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="filter-controls">
+                    <div class="select-wrap">
+                        <i class="fas fa-location-dot"></i>
+                        <select id="filterKecamatan">
+                            <option value="all">Semua Kecamatan</option>
+                            <option value="Ngambon">Kec. Ngambon</option>
+                            <option value="Tambakrejo">Kec. Tambakrejo</option>
+                        </select>
+                    </div>
+                    <div class="select-wrap">
+                        <i class="fas fa-filter"></i>
+                        <select id="filterStatus">
+                            <option value="all">Semua Status</option>
+                            <option value="belum diproses">Menunggu</option>
+                            <option value="proses">Diproses</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+                    <button class="export-btn" onclick="exportToCSV()">
+                        <i class="fas fa-file-csv"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-results-info" id="tableInfo"></div>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="col-no">No</th>
+                            <th>Tanggal</th>
+                            <th>Kecamatan</th>
+                            <th>Lokasi</th>
+                            <th>Deskripsi</th>
+                            <th>Kategori</th>
+                            <th>Pelapor</th>
+                            <th>Status</th>
+                            <th class="col-aksi">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="laporanTableBody">
+                        <tr><td colspan="9" class="loading-cell">
+                            <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+                            <span>Memuat data…</span>
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== STATISTIK PAGE ===== -->
+        <div id="statistikPage" class="page">
+            <div class="stats-grid" style="margin-bottom:24px;">
+                <div class="stat-card stat-total" style="grid-column:span 2;">
+                    <div class="stat-meta">
+                        <div class="stat-label">Rata-rata Waktu Tertangani</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-stopwatch"></i></div>
+                    </div>
+                    <div class="stat-number" id="avgResponse">—</div>
+                    <div class="stat-footer">Sejak laporan masuk hingga selesai (estimasi)</div>
+                </div>
+                <div class="stat-card stat-done" style="grid-column:span 2;">
+                    <div class="stat-meta">
+                        <div class="stat-label">Kategori Terbanyak</div>
+                        <div class="stat-icon-wrap"><i class="fas fa-trophy"></i></div>
+                    </div>
+                    <div class="stat-number stat-emoji" id="topKategori">—</div>
+                    <div class="stat-footer">Jenis sampah paling sering dilaporkan</div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Per Kecamatan</h3>
+                        <span class="chart-badge"><i class="fas fa-map"></i></span>
+                    </div>
+                    <canvas id="statKecamatanChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Distribusi Status</h3>
+                        <span class="chart-badge"><i class="fas fa-circle-half-stroke"></i></span>
+                    </div>
+                    <canvas id="statStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div><!-- /adminPanel -->
+
+<script src="admin.js"></script>
+</body>
+</html>
