@@ -1,5 +1,5 @@
 // ==================== KONFIGURASI ====================
-const SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbzNuMWcwD4itLwsQJmCpdrS9gnfBZzr3B8lA8lphS3Crx2A9VfzfSWBxMPNZ-Dd97ky/exec';
+const SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
 const ADMIN_PASSWORD = 'dlh2026';
 const SESSION_HOURS  = 8;
 
