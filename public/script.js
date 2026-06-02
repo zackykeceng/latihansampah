@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNuMWcwD4itLwsQJmCpdrS9gnfBZzr3B8lA8lphS3Crx2A9VfzfSWBxMPNZ-Dd97ky/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 // Koordinat berdasarkan batas administrasi resmi (BPS/OSM) Kab. Bojonegoro
@@ -822,42 +822,42 @@ function resetFormToStep1() {
 }
 
 // ==================== SUBMIT LAPORAN ====================
+// Strategi pengiriman 2 tahap:
+//   Tahap 1 — data teks (url-encoded, terbukti bekerja, tanpa foto)
+//   Tahap 2 — foto saja (text/plain + JSON, hanya {action,timestamp,foto})
+// Alasan dipisah: url-encoded merusak karakter + dalam base64,
+// sedangkan body besar dalam satu request sering terpotong di Apps Script.
 async function submitLaporan(e) {
     e.preventDefault();
-    
+
     const foto = fotoInput ? fotoInput.files[0] : null;
     if (!foto) {
         showNotification('Harap unggah foto dokumentasi sampah', 'error');
         return;
     }
-    
     if (!selectedLat || !selectedLng) {
         showNotification('Harap pilih lokasi kejadian terlebih dahulu', 'error');
         return;
     }
-    
     if (!currentLocationValid) {
         showNotification('❌ Lokasi di luar wilayah layanan DLH!', 'error');
         return;
     }
-    
     const deskripsi = deskripsiInput ? deskripsiInput.value : '';
     if (!deskripsi) {
         showNotification('Harap isi deskripsi sampah', 'error');
         return;
     }
-    
     if (deskripsi.length > 500) {
         showNotification('Deskripsi maksimal 500 karakter', 'error');
         return;
     }
-    
-    const fotoBase64 = await convertToBase64(foto);
-    const volume = document.getElementById('volume')?.value || 'tidak diketahui';
-    const kategori = document.getElementById('kategori')?.value || 'lainnya';
-    const nama = document.getElementById('nama')?.value || 'Anonim';
-    const kontak = document.getElementById('kontak')?.value || '-';
-    const lokasi = document.getElementById('lokasi')?.value || '';
+
+    const volume    = document.getElementById('volume')?.value || 'tidak diketahui';
+    const kategori  = document.getElementById('kategori')?.value || 'lainnya';
+    const nama      = document.getElementById('nama')?.value || 'Anonim';
+    const kontak    = document.getElementById('kontak')?.value || '-';
+    const lokasi    = document.getElementById('lokasi')?.value || '';
     const timestamp = new Date().toISOString();
 
     if (submitBtn) {
@@ -866,37 +866,55 @@ async function submitLaporan(e) {
     }
 
     try {
+        // ── TAHAP 1: kirim data teks tanpa foto (url-encoded) ──────────────
         const params = new URLSearchParams({
-            action: 'submit',
+            action:    'submit',
             timestamp: timestamp,
-            foto: fotoBase64,
-            lokasi: lokasi,
-            latitude: String(selectedLat),
+            foto:      '',        // kosong dulu, diisi tahap 2
+            lokasi:    lokasi,
+            latitude:  String(selectedLat),
             longitude: String(selectedLng),
             kecamatan: currentKecamatan || '',
             deskripsi: deskripsi,
-            nama: nama,
-            kontak: kontak,
-            kategori: kategori,
-            volume: volume,
-            status: 'belum diproses',
-            sumber: 'Web DLH Bojonegoro'
+            nama:      nama,
+            kontak:    kontak,
+            kategori:  kategori,
+            volume:    volume,
+            status:    'belum diproses',
+            sumber:    'Web DLH Bojonegoro'
         });
 
         await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
+            method:  'POST',
+            mode:    'no-cors',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params.toString()
+            body:    params.toString()
         });
-        
+
+        // ── TAHAP 2: kirim foto terpisah (text/plain + JSON) ───────────────
+        // text/plain adalah satu-satunya Content-Type yang diizinkan no-cors
+        // sekaligus tidak mengubah karakter apapun dalam string JSON/base64.
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah foto...';
+        }
+
+        const fotoBase64 = await compressAndConvertToBase64(foto);
+
+        await fetch(SCRIPT_URL, {
+            method:  'POST',
+            mode:    'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body:    JSON.stringify({
+                action:    'upload_foto',
+                timestamp: timestamp,   // kunci untuk mencocokkan baris di sheet
+                foto:      fotoBase64
+            })
+        });
+
         showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
-        
-        // Reset form ke step 1
         resetFormToStep1();
-        
-        setTimeout(() => loadLaporan(), 1000);
-        
+        setTimeout(() => loadLaporan(), 2000);
+
     } catch (error) {
         console.error('Error:', error);
         showNotification('Gagal mengirim laporan. Periksa koneksi internet.', 'error');
@@ -908,6 +926,33 @@ async function submitLaporan(e) {
     }
 }
 
+// Kompres foto ke max 1200px JPEG 80% sebelum dikirim
+function compressAndConvertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const img = new Image();
+            img.onload = function() {
+                const MAX = 1200;
+                let w = img.width, h = img.height;
+                if (w > MAX || h > MAX) {
+                    if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                    else        { w = Math.round(w * MAX / h); h = MAX; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Fallback tanpa kompresi
 function convertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
