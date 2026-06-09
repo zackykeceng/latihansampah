@@ -2,285 +2,559 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#10b981">
-    <meta name="description" content="Sistem Informasi Pengaduan Sampah Online - Dinas Lingkungan Hidup Kabupaten Bojonegoro">
-    <title>DLH Bojonegoro | Sistem Laporan Sampah Online</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Font Awesome Icons -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DLH Bojonegoro - Laporan Sampah</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    
-    <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
     <link rel="stylesheet" href="style.css">
+<base target="_blank">
 </head>
 <body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div style="position: relative;">
+                <div class="loader-ring"></div>
+                <div class="loader-leaf">🌿</div>
+            </div>
+            <p>Memuat Aplikasi DLH Bojonegoro...</p>
+        </div>
+    </div>
+
     <!-- Custom Cursor -->
     <div class="cursor-dot" id="cursorDot"></div>
     <div class="cursor-outline" id="cursorOutline"></div>
 
-    <!-- Loading Screen -->
-    <div class="loader" id="loader">
-        <div class="loader-content">
-            <div class="loader-ring"></div>
-            <div class="loader-leaf"><i class="fas fa-leaf"></i></div>
-            <p>Memuat Sistem DLH...</p>
-        </div>
-    </div>
-
-    <!-- Floating Action Button -->
-    <button id="scrollTopBtn" class="scroll-top"><i class="fas fa-arrow-up"></i></button>
+    <!-- Scroll Top -->
+    <button class="scroll-top" id="scrollTopBtn">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <div class="nav-logo" data-aos="fade-right" data-aos-duration="800">
-                <div class="logo-icon"><i class="fas fa-tree"></i></div>
-                <div class="logo-text">DLH<span> Bojonegoro</span></div>
-            </div>
+            <a href="#" class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="logo-text">DLH<span>Bojonegoro</span></div>
+            </a>
             <div class="nav-links" id="navLinks">
-                <a href="#home" class="nav-link active"><i class="fas fa-home"></i><span>Beranda</span></a>
-                <a href="#lapor" class="nav-link"><i class="fas fa-pen-alt"></i><span>Lapor Sampah</span></a>
-                <a href="#peta" class="nav-link"><i class="fas fa-map"></i><span>Peta Sebaran</span></a>
-                <a href="#daftar" class="nav-link"><i class="fas fa-list-ul"></i><span>Daftar Laporan</span></a>
-                <a href="#info" class="nav-link"><i class="fas fa-info-circle"></i><span>Informasi</span></a>
+                <a href="#beranda" class="nav-link active"><i class="fas fa-home"></i> Beranda</a>
+                <a href="#lapor" class="nav-link"><i class="fas fa-edit"></i> Lapor</a>
+                <a href="#peta" class="nav-link"><i class="fas fa-map"></i> Peta Sebaran</a>
+                <a href="#daftar" class="nav-link"><i class="fas fa-list"></i> Daftar Laporan</a>
+                <a href="#info" class="nav-link"><i class="fas fa-info-circle"></i> Info</a>
             </div>
-            <div class="nav-toggle" id="navToggle"><i class="fas fa-bars"></i></div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="hero">
+    <section class="hero" id="beranda">
         <div class="hero-particles" id="heroParticles"></div>
         <div class="hero-gradient-bg"></div>
-        <div class="hero-content">
-            <div class="hero-badge" data-aos="fade-up" data-aos-duration="800">
-                <i class="fas fa-recycle"></i><span>Dinas Lingkungan Hidup Kab. Bojonegoro</span><i class="fas fa-certificate"></i>
+        <div class="hero-content" data-aos="fade-up">
+            <div class="hero-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span>Sistem Resmi DLH Kabupaten Bojonegoro</span>
+                <i class="fas fa-star"></i>
             </div>
-            <h1 class="hero-title" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
-                Lapor <span class="gradient-text">Sampah</span><br>Kami <span class="gradient-text">Tindaklanjuti</span>
-                <span class="title-decoration"><svg viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 Q50,0 100,10 T200,10" stroke="url(#gradient)" fill="none" stroke-width="2"/><defs><linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs></svg></span>
+            <h1 class="hero-title">
+                Lapor Sampah<br>
+                <span class="gradient-text">Ngambon & Tambakrejo</span>
+                <div class="title-decoration">
+                    <svg viewBox="0 0 200 20" fill="none">
+                        <path d="M0 10 Q50 0 100 10 T200 10" stroke="#10b981" stroke-width="3" fill="none"/>
+                    </svg>
+                </div>
             </h1>
-            <p class="hero-subtitle" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
-                Sistem Informasi Pengaduan Sampah Online - Layanan cepat untuk Kecamatan 
-                <strong class="highlight-text">Ngambon</strong> & <strong class="highlight-text">Tambakrejo</strong>
+            <p class="hero-subtitle">
+                Laporkan masalah sampah di wilayah Anda dengan mudah. 
+                <span class="highlight-text">DLH Bojonegoro</span> siap menindaklanjuti setiap laporan masyarakat.
             </p>
-            <div class="hero-stats" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
-                <div class="stat-item"><div class="stat-icon"><i class="fas fa-trash-alt"></i></div><div><div class="stat-number" id="heroTotalLaporan">0</div><div class="stat-label">Total Laporan</div></div></div>
-                <div class="stat-item"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-number" id="heroSelesai">0</div><div class="stat-label">Selesai</div></div></div>
-                <div class="stat-item"><div class="stat-icon"><i class="fas fa-clock"></i></div><div><div class="stat-number" id="heroProses">0</div><div class="stat-label">Diproses</div></div></div>
+            <div class="hero-stats">
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-icon">📋</div>
+                    <div>
+                        <div class="stat-number" id="heroTotalLaporan">0</div>
+                        <div class="stat-label">Total Laporan</div>
+                    </div>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon">✅</div>
+                    <div>
+                        <div class="stat-number" id="heroSelesai">0</div>
+                        <div class="stat-label">Selesai</div>
+                    </div>
+                </div>
+                <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-icon">🔄</div>
+                    <div>
+                        <div class="stat-number" id="heroProses">0</div>
+                        <div class="stat-label">Diproses</div>
+                    </div>
+                </div>
             </div>
-            <div class="hero-buttons" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-                <a href="#lapor" class="btn-primary"><i class="fas fa-paper-plane"></i><span>Laporkan Sekarang</span><i class="fas fa-arrow-right"></i></a>
-                <a href="#daftar" class="btn-secondary"><i class="fas fa-eye"></i><span>Lihat Laporan</span></a>
+            <div class="hero-buttons">
+                <a href="#lapor" class="btn-primary">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Buat Laporan</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <a href="#peta" class="btn-secondary">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Lihat Peta Sebaran</span>
+                </a>
             </div>
         </div>
-        <div class="hero-wave"><svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f8fafc"/></svg></div>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#f8fafc"/>
+            </svg>
+        </div>
     </section>
 
-    <div class="container">
-        <!-- Form Laporan Section -->
-        <section id="lapor" class="section form-section">
+    <!-- Form Section -->
+    <section class="section" id="lapor">
+        <div class="container">
             <div class="section-header" data-aos="fade-up">
-                <div class="section-badge">Form Pengaduan</div>
-                <div class="section-icon"><i class="fas fa-pen-fancy"></i></div>
-                <h2 class="section-title">Buat Laporan <span class="text-gradient">Sampah</span></h2>
-                <p class="section-subtitle">Isi data dengan lengkap agar DLH cepat menindaklanjuti</p>
+                <div class="section-badge">Formulir Laporan</div>
+                <div class="section-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h2 class="section-title">Buat <span class="text-gradient">Laporan Baru</span></h2>
+                <p class="section-subtitle">Laporkan masalah sampah di wilayah Ngambon & Tambakrejo dengan mengisi formulir di bawah ini</p>
             </div>
-            <div class="form-card" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="form-card" data-aos="fade-up">
                 <div class="form-progress">
                     <div class="progress-steps">
-                        <div class="step active" data-step="1"><div class="step-number">1</div><div class="step-label">Dokumentasi</div></div>
-                        <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">Lokasi</div></div>
-                        <div class="step" data-step="3"><div class="step-number">3</div><div class="step-label">Detail</div></div>
-                        <div class="step" data-step="4"><div class="step-number">4</div><div class="step-label">Selesai</div></div>
+                        <div class="step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Foto</div>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Lokasi</div>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Detail</div>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Kirim</div>
+                        </div>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%"></div>
+                    </div>
                 </div>
-                <form id="formLaporan" class="laporan-form">
-                    <!-- Step 1: Dokumentasi -->
+
+                <form class="laporan-form" id="formLaporan">
+                    <!-- Step 1: Foto -->
                     <div class="form-step active" data-step="1">
-                        <div class="form-group photo-group">
-                            <label class="form-label"><i class="fas fa-camera-retro"></i> Dokumentasi Sampah <span class="required-badge">Wajib</span></label>
-                            <div class="photo-upload" id="photoUpload">
-                                <input type="file" id="foto" accept="image/*" capture="environment" required>
-                                <div class="photo-placeholder"><div class="photo-icon"><i class="fas fa-cloud-upload-alt"></i></div><p>Klik atau tap untuk upload foto</p><span>JPG, PNG (max 5MB)</span></div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-camera"></i>
+                                Foto Dokumentasi
+                                <span class="required-badge">Wajib</span>
+                            </label>
+                            <div class="photo-upload">
+                                <input type="file" id="foto" accept="image/*" capture="environment">
+                                <div class="photo-placeholder">
+                                    <div class="photo-icon">
+                                        <i class="fas fa-camera-retro"></i>
+                                    </div>
+                                    <p>Klik atau seret foto di sini</p>
+                                    <span>Format: JPG, PNG (Maks. 5MB)</span>
+                                </div>
                                 <div class="photo-preview" id="photoPreview"></div>
                             </div>
                         </div>
-                        <div class="form-navigation"><button type="button" class="btn-next" data-next="2">Selanjutnya <i class="fas fa-arrow-right"></i></button></div>
+                        <div class="form-navigation">
+                            <div></div>
+                            <button type="button" class="btn-next" data-next="2">
+                                <span>Lanjutkan</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Step 2: Lokasi -->
                     <div class="form-step" data-step="2">
                         <div class="form-group">
-                            <label class="form-label"><i class="fas fa-map-marker-alt"></i> Lokasi Kejadian <span class="required-badge">Wajib</span></label>
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Lokasi Kejadian
+                                <span class="required-badge">Wajib</span>
+                            </label>
                             <div class="location-input-group">
-                                <button type="button" id="getLocationBtn" class="btn-location"><i class="fas fa-location-dot"></i> Gunakan Lokasi Saya</button>
-                                <input type="text" id="lokasi" placeholder="Atau tulis alamat lengkap" required>
+                                <input type="text" id="lokasi" placeholder="Klik peta atau gunakan GPS" readonly>
+                                <button type="button" class="btn-location" id="getLocationBtn">
+                                    <i class="fas fa-location-dot"></i>
+                                    Gunakan Lokasi Saya
+                                </button>
                             </div>
-                            <div id="validasiLokasiGroup" style="display: none;"><div class="location-status" id="locationStatus"></div></div>
+                            <div id="validasiLokasiGroup" style="display: none;">
+                                <div class="location-status" id="locationStatus"></div>
+                            </div>
                         </div>
+                        <div id="map" style="height: 400px; border-radius: 12px; margin-bottom: 1rem;"></div>
                         <div class="form-navigation">
-                            <button type="button" class="btn-prev" data-prev="1"><i class="fas fa-arrow-left"></i> Kembali</button>
-                            <button type="button" class="btn-next" data-next="3">Selanjutnya <i class="fas fa-arrow-right"></i></button>
+                            <button type="button" class="btn-prev" data-prev="1">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Kembali</span>
+                            </button>
+                            <button type="button" class="btn-next" data-next="3">
+                                <span>Lanjutkan</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Step 3: Detail -->
                     <div class="form-step" data-step="3">
-                        <div class="form-grid">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label class="form-label"><i class="fas fa-align-left"></i> Deskripsi Sampah <span class="required-badge">Wajib</span></label>
-                                    <textarea id="deskripsi" rows="4" placeholder="Contoh: Tumpukan sampah rumah tangga sudah 3 hari tidak diangkut, volume sekitar 2 pick up, bau menyengat..."></textarea>
-                                    <div class="char-counter"><span id="charCount">0</span> / 500 karakter</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Nama Pelapor
+                                </label>
+                                <input type="text" id="nama" placeholder="Nama Anda (boleh anonim)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    Kontak
+                                </label>
+                                <input type="text" id="kontak" placeholder="No. HP atau Email">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Kategori Sampah
+                                <span class="required-badge">Wajib</span>
+                            </label>
+                            <select id="kategori" required>
+                                <option value="">Pilih kategori sampah...</option>
+                                <option value="rumah-tangga">🏠 Sampah Rumah Tangga</option>
+                                <option value="plastik">🪣 Sampah Plastik</option>
+                                <option value="bangunan">🏗️ Sampah Bangunan</option>
+                                <option value="b3">⚠️ Sampah B3 (Bahan Berbahaya)</option>
+                                <option value="medis">🏥 Sampah Medis</option>
+                                <option value="limbah-pabrik">🏭 Limbah Pabrik</option>
+                                <option value="lainnya">📦 Lainnya</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-truck"></i>
+                                Perkiraan Volume
+                            </label>
+                            <div class="volume-selector">
+                                <div class="volume-option" data-volume="kecil">
+                                    <i class="fas fa-box"></i>
+                                    <span>Kecil</span>
+                                    <small>≤ 1 pick up</small>
+                                </div>
+                                <div class="volume-option" data-volume="sedang">
+                                    <i class="fas fa-truck-pickup"></i>
+                                    <span>Sedang</span>
+                                    <small>1-3 pick up</small>
+                                </div>
+                                <div class="volume-option" data-volume="besar">
+                                    <i class="fas fa-truck-moving"></i>
+                                    <span>Besar</span>
+                                    <small>≥ 3 pick up</small>
                                 </div>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label class="form-label"><i class="fas fa-tag"></i> Jenis Sampah</label>
-                                    <div class="category-selector">
-                                        <select id="kategori">
-                                            <option value="">Pilih jenis sampah</option>
-                                            <option value="rumah-tangga">🏠 Sampah Rumah Tangga</option>
-                                            <option value="plastik">🪣 Sampah Plastik</option>
-                                            <option value="bangunan">🏗️ Sampah Bangunan</option>
-                                            <option value="b3">⚠️ Sampah B3 (Berbahaya)</option>
-                                            <option value="medis">🏥 Sampah Medis</option>
-                                            <option value="limbah-pabrik">🏭 Limbah Pabrik</option>
-                                            <option value="lainnya">📦 Lainnya</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label"><i class="fas fa-truck"></i> Estimasi Volume</label>
-                                    <div class="volume-selector">
-                                        <div class="volume-option" data-volume="kecil"><i class="fas fa-box"></i><span>Kecil</span><small>≤ 1 pick up</small></div>
-                                        <div class="volume-option" data-volume="sedang"><i class="fas fa-truck"></i><span>Sedang</span><small>1-3 pick up</small></div>
-                                        <div class="volume-option" data-volume="besar"><i class="fas fa-truck-fast"></i><span>Besar</span><small>≥ 3 pick up</small></div>
-                                    </div>
-                                    <input type="hidden" id="volume" value="">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group"><label class="form-label"><i class="fas fa-user"></i> Nama Pelapor</label><input type="text" id="nama" placeholder="Nama lengkap (boleh anonim)"></div>
-                                    <div class="form-group"><label class="form-label"><i class="fab fa-whatsapp"></i> Nomor WhatsApp</label><input type="tel" id="kontak" placeholder="Contoh: 081234567890"></div>
-                                </div>
+                            <input type="hidden" id="volume">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Deskripsi
+                                <span class="required-badge">Wajib</span>
+                            </label>
+                            <textarea id="deskripsi" rows="4" placeholder="Jelaskan kondisi sampah, akses jalan, dll." maxlength="500" required></textarea>
+                            <div class="char-counter">
+                                <span id="charCount">0</span>/500 karakter
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-prev" data-prev="2">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Kembali</span>
+                            </button>
+                            <button type="button" class="btn-next" data-next="4">
+                                <span>Lanjutkan</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Kirim -->
+                    <div class="form-step" data-step="4">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle"></i>
+                                Review Laporan
+                            </label>
+                            <div id="reviewContent" style="background: var(--light); padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                                <p style="text-align: center; color: var(--gray);">Silakan review laporan Anda sebelum dikirim</p>
                             </div>
                         </div>
                         <div class="form-navigation">
-                            <button type="button" class="btn-prev" data-prev="2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                            <button type="submit" class="btn-submit" id="submitBtn"><span>Kirim Laporan</span><i class="fas fa-paper-plane"></i></button>
+                            <button type="button" class="btn-prev" data-prev="3">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Kembali</span>
+                            </button>
+                            <button type="submit" class="btn-submit" id="submitBtn">
+                                <span>Kirim Laporan</span>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
                     </div>
                 </form>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Peta Section -->
-        <section id="peta" class="section map-section">
+    <!-- Peta Sebaran Section -->
+    <section class="section" id="peta">
+        <div class="container">
             <div class="section-header" data-aos="fade-up">
-                <div class="section-badge">Visualisasi Data</div>
-                <div class="section-icon"><i class="fas fa-map-marked-alt"></i></div>
-                <h2 class="section-title">Peta Sebaran <span class="text-gradient">Titik Sampah</span></h2>
-                <p class="section-subtitle">Klik pada peta untuk memilih lokasi laporan</p>
+                <div class="section-badge">Peta Sebaran</div>
+                <div class="section-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h2 class="section-title">Peta <span class="text-gradient">Sebaran Laporan</span></h2>
+                <p class="section-subtitle">Lihat lokasi laporan sampah yang telah masuk ke sistem DLH Bojonegoro</p>
             </div>
-            <div class="map-container" data-aos="fade-up" data-aos-delay="100">
-                <div class="map-card">
-                    <div class="map-header">
-                        <div class="map-title"><i class="fas fa-map"></i><span>Wilayah Layanan DLH Bojonegoro</span></div>
-                        <div class="map-legend">
-                            <div class="legend-item"><span class="legend-color" style="background: #10b981;"></span><span>Area Layanan</span></div>
-                            <div class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span><span>Titik Laporan</span></div>
+
+            <div class="map-card" data-aos="fade-up">
+                <div class="map-header">
+                    <div class="map-title">
+                        <i class="fas fa-map"></i>
+                        Sebaran Laporan Sampah - Ngambon & Tambakrejo
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #f59e0b;"></div>
+                            <span>Menunggu</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #3b82f6;"></div>
+                            <span>Diproses</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #10b981;"></div>
+                            <span>Selesai</span>
                         </div>
                     </div>
-                    <div id="map"></div>
-                    <div class="map-footer"><i class="fas fa-info-circle"></i><span>Area layanan: Kecamatan Ngambon & Tambakrejo | 🗑️ Klik marker untuk detail laporan</span></div>
+                </div>
+                <div id="petaSebaran" style="height: 500px; width: 100%;"></div>
+                <div class="map-footer">
+                    <i class="fas fa-info-circle"></i>
+                    Klik marker untuk melihat detail laporan. Data diperbarui otomatis setiap 30 detik.
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Daftar Laporan Section -->
-        <section id="daftar" class="section reports-section">
+    <!-- Daftar Laporan Section -->
+    <section class="section" id="daftar">
+        <div class="container">
             <div class="section-header" data-aos="fade-up">
-                <div class="section-badge">Database Laporan</div>
-                <div class="section-icon"><i class="fas fa-clipboard-list"></i></div>
-                <h2 class="section-title">Daftar <span class="text-gradient">Pengaduan Sampah</span></h2>
-                <p class="section-subtitle">Semua laporan yang masuk akan diproses oleh DLH Bojonegoro</p>
+                <div class="section-badge">Daftar Laporan</div>
+                <div class="section-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h2 class="section-title">Daftar <span class="text-gradient">Laporan Masuk</span></h2>
+                <p class="section-subtitle">Lihat semua laporan yang telah masuk dan status penanganannya</p>
             </div>
 
-            <!-- Filter Bar -->
-            <div class="filter-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="filter-header"><i class="fas fa-filter"></i><span>Filter Laporan</span></div>
+            <div class="filter-card" data-aos="fade-up">
+                <div class="filter-header">
+                    <i class="fas fa-filter"></i>
+                    Filter Laporan
+                </div>
                 <div class="filter-body">
-                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchLaporan" placeholder="Cari laporan berdasarkan nama, lokasi, atau deskripsi..."><button class="search-clear" id="searchClear" style="display: none;"><i class="fas fa-times-circle"></i></button></div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchLaporan" placeholder="Cari laporan...">
+                        <button class="search-clear" id="searchClear" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                     <div class="filter-group">
-                        <select id="filterStatus" class="filter-select"><option value="all">📊 Semua Status</option><option value="belum diproses">⏳ Menunggu Verifikasi</option><option value="proses">🔄 Sedang Diproses</option><option value="selesai">✅ Selesai</option></select>
-                        <select id="filterKecamatan" class="filter-select"><option value="all">🏘️ Semua Kecamatan</option><option value="Ngambon">🌿 Kec. Ngambon</option><option value="Tambakrejo">🏞️ Kec. Tambakrejo</option></select>
-                        <select id="filterKategori" class="filter-select"><option value="all">🗑️ Semua Jenis</option><option value="rumah-tangga">🏠 Rumah Tangga</option><option value="plastik">🪣 Plastik</option><option value="bangunan">🏗️ Bangunan</option><option value="b3">⚠️ B3</option><option value="medis">🏥 Medis</option></select>
+                        <select class="filter-select" id="filterStatus">
+                            <option value="all">Semua Status</option>
+                            <option value="belum diproses">⏳ Menunggu Verifikasi</option>
+                            <option value="proses">🔄 Sedang Diproses</option>
+                            <option value="selesai">✅ Selesai</option>
+                        </select>
+                        <select class="filter-select" id="filterKecamatan">
+                            <option value="all">Semua Kecamatan</option>
+                            <option value="Ngambon">Ngambon</option>
+                            <option value="Tambakrejo">Tambakrejo</option>
+                        </select>
+                        <select class="filter-select" id="filterKategori">
+                            <option value="all">Semua Kategori</option>
+                            <option value="rumah-tangga">🏠 Rumah Tangga</option>
+                            <option value="plastik">🪣 Plastik</option>
+                            <option value="bangunan">🏗️ Bangunan</option>
+                            <option value="b3">⚠️ B3</option>
+                            <option value="medis">🏥 Medis</option>
+                            <option value="limbah-pabrik">🏭 Pabrik</option>
+                            <option value="lainnya">📦 Lainnya</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <div class="laporan-grid" id="laporanList"><div class="loading-state"><div class="loading-spinner"></div><p>Memuat data laporan...</p></div></div>
-        </section>
+            <div class="laporan-grid" id="laporanList">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Memuat data laporan dari server DLH...</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <!-- Info DLH Section -->
-        <section id="info" class="section info-section">
+    <!-- Info Section -->
+    <section class="section" id="info">
+        <div class="container">
             <div class="section-header" data-aos="fade-up">
-                <div class="section-badge">Informasi DLH</div>
-                <div class="section-icon"><i class="fas fa-building"></i></div>
-                <h2 class="section-title">Layanan & <span class="text-gradient">Informasi</span></h2>
-                <p class="section-subtitle">Informasi lengkap tentang Dinas Lingkungan Hidup Kabupaten Bojonegoro</p>
+                <div class="section-badge">Informasi</div>
+                <div class="section-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h2 class="section-title">Informasi <span class="text-gradient">Penting</span></h2>
+                <p class="section-subtitle">Ketahui lebih lanjut tentang pengelolaan sampah di Bojonegoro</p>
             </div>
-            <div class="info-grid">
-                <div class="info-card" data-aos="fade-up" data-aos-delay="100"><div class="info-card-icon"><i class="fas fa-clock"></i></div><h3>Waktu Respon</h3><p>DLH akan merespon laporan maksimal <strong>1x24 jam</strong> setelah verifikasi</p><div class="info-card-badge">Cepat Tanggap</div></div>
-                <div class="info-card" data-aos="fade-up" data-aos-delay="200"><div class="info-card-icon"><i class="fas fa-truck-fast"></i></div><h3>Armada DLH</h3><p>Dinas menyediakan armada khusus untuk pengangkutan sampah di wilayah layanan</p><div class="info-card-badge">3+ Armada</div></div>
-                <div class="info-card" data-aos="fade-up" data-aos-delay="300"><div class="info-card-icon"><i class="fas fa-headset"></i></div><h3>Kontak DLH</h3><p><strong><i class="fas fa-phone"></i> (0353) 881234</strong><br><strong><i class="fab fa-whatsapp"></i> 0812-3456-7890</strong><br><small><i class="fas fa-envelope"></i> dlh@bojonegorokab.go.id</small></p></div>
-                <div class="info-card" data-aos="fade-up" data-aos-delay="400"><div class="info-card-icon"><i class="fas fa-map-pin"></i></div><h3>Kantor DLH</h3><p>Jl. Panglima Polim No. 20, Bojonegoro<br><small><i class="fas fa-clock"></i> Senin-Jumat 08.00-16.00</small></p></div>
+
+            <div class="info-section" data-aos="fade-up">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-recycle"></i>
+                        </div>
+                        <h3>3R (Reduce, Reuse, Recycle)</h3>
+                        <p>Kurangi penggunaan plastik sekali pakai, gunakan kembali barang yang masih layak, dan pilah sampah untuk didaur ulang.</p>
+                        <span class="info-card-badge">Tips Pengelolaan</span>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <h3>Pilah Sampah</h3>
+                        <p>Pisahkan sampah organik dan anorganik. Sampah organik bisa dijadikan kompos, sedangkan anorganik bisa didaur ulang.</p>
+                        <span class="info-card-badge">Tips Pengelolaan</span>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <h3>Tanggung Jawab Bersama</h3>
+                        <p>Kebersihan lingkungan adalah tanggung jawab bersama. Laporkan masalah sampah untuk penanganan cepat oleh DLH.</p>
+                        <span class="info-card-badge">Aksi Masyarakat</span>
+                    </div>
+                </div>
+
+                <div class="regulation-box" data-aos="fade-up">
+                    <div class="regulation-header">
+                        <i class="fas fa-gavel"></i>
+                        <h3>Peraturan Terkait</h3>
+                    </div>
+                    <ul class="regulation-list">
+                        <li>
+                            <span class="regulation-number">1</span>
+                            <span>UU No. 18 Tahun 2008 tentang Pengelolaan Sampah</span>
+                        </li>
+                        <li>
+                            <span class="regulation-number">2</span>
+                            <span>Peraturan Pemerintah No. 81 Tahun 2012 tentang Pengelolaan Sampah Rumah Tangga</span>
+                        </li>
+                        <li>
+                            <span class="regulation-number">3</span>
+                            <span>Perda Kab. Bojonegoro No. 12 Tahun 2019 tentang Pengelolaan Sampah</span>
+                        </li>
+                        <li>
+                            <span class="regulation-number">4</span>
+                            <span>Denda pelanggaran pengelolaan sampah sesuai ketentuan yang berlaku</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="regulation-box" data-aos="fade-up" data-aos-delay="500">
-                <div class="regulation-header"><i class="fas fa-gavel"></i><h3>Dasar Hukum</h3></div>
-                <ul class="regulation-list">
-                    <li><span class="regulation-number">1</span><span>Undang-Undang No. 18 Tahun 2008 tentang Pengelolaan Sampah</span></li>
-                    <li><span class="regulation-number">2</span><span>Peraturan Daerah Kab. Bojonegoro No. 5 Tahun 2018 tentang Pengelolaan Sampah</span></li>
-                    <li><span class="regulation-number">3</span><span>Peraturan Bupati Bojonegoro No. 12 Tahun 2023 tentang Sistem Informasi Pengaduan Sampah</span></li>
-                </ul>
-            </div>
-        </section>
-    </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-wave"><svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#0f172a"/></svg></div>
+        <div class="footer-wave">
+            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 60L60 52.5C120 45 240 30 360 22.5C480 15 600 15 720 18.75C840 22.5 960 30 1080 33.75C1200 37.5 1320 37.5 1380 37.5L1440 37.5V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" fill="#0f172a"/>
+            </svg>
+        </div>
         <div class="footer-content">
-            <div class="footer-section" data-aos="fade-up" data-aos-delay="100">
-                <div class="footer-logo"><div class="logo-icon"><i class="fas fa-tree"></i></div><div class="logo-text">DLH<span> Bojonegoro</span></div></div>
-                <p>Dinas Lingkungan Hidup Kabupaten Bojonegoro berkomitmen mewujudkan lingkungan yang bersih, sehat, dan berkelanjutan.</p>
-                <div class="social-links"><a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-link"><i class="fab fa-instagram"></i></a><a href="#" class="social-link"><i class="fab fa-twitter"></i></a><a href="#" class="social-link"><i class="fab fa-youtube"></i></a></div>
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="logo-text">DLH<span>Bojonegoro</span></div>
+                </div>
+                <p>Dinas Lingkungan Hidup Kabupaten Bojonegoro berkomitmen untuk menjaga kebersihan dan kesehatan lingkungan demi kualitas hidup yang lebih baik.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
             </div>
-            <div class="footer-section" data-aos="fade-up" data-aos-delay="200">
-                <h4>Tautan Cepat</h4>
-                <ul><li><a href="#home"><i class="fas fa-chevron-right"></i> Beranda</a></li><li><a href="#lapor"><i class="fas fa-chevron-right"></i> Lapor Sampah</a></li><li><a href="#peta"><i class="fas fa-chevron-right"></i> Peta Sebaran</a></li><li><a href="#daftar"><i class="fas fa-chevron-right"></i> Daftar Laporan</a></li><li><a href="#info"><i class="fas fa-chevron-right"></i> Informasi DLH</a></li></ul>
+            <div class="footer-section">
+                <h4>Menu Cepat</h4>
+                <ul>
+                    <li><a href="#beranda"><i class="fas fa-home"></i> Beranda</a></li>
+                    <li><a href="#lapor"><i class="fas fa-edit"></i> Buat Laporan</a></li>
+                    <li><a href="#peta"><i class="fas fa-map"></i> Peta Sebaran</a></li>
+                    <li><a href="#daftar"><i class="fas fa-list"></i> Daftar Laporan</a></li>
+                </ul>
             </div>
-            <div class="footer-section" data-aos="fade-up" data-aos-delay="300">
-                <h4>Layanan Pengaduan</h4>
-                <ul class="contact-list"><li><i class="fas fa-phone"></i><span>(0353) 881234</span></li><li><i class="fab fa-whatsapp"></i><span>0812-3456-7890</span></li><li><i class="fas fa-envelope"></i><span>dlh@bojonegorokab.go.id</span></li><li><i class="fas fa-globe"></i><span>dlh.bojonegorokab.go.id</span></li></ul>
+            <div class="footer-section">
+                <h4>Kontak Kami</h4>
+                <ul class="contact-list">
+                    <li><i class="fas fa-map-marker-alt"></i> Jl. Teuku Umar No. 10, Bojonegoro</li>
+                    <li><i class="fas fa-phone"></i> (0353) 881-123</li>
+                    <li><i class="fas fa-envelope"></i> dlh@bojonegorokab.go.id</li>
+                </ul>
             </div>
-            <div class="footer-section" data-aos="fade-up" data-aos-delay="400">
-                <h4>Jam Pelayanan</h4>
-                <ul class="hours-list"><li><i class="fas fa-clock"></i> Senin - Kamis: 08.00 - 15.00</li><li><i class="fas fa-clock"></i> Jumat: 08.00 - 14.30</li><li><i class="fas fa-clock"></i> Sabtu - Minggu: Libur</li></ul>
+            <div class="footer-section">
+                <h4>Jam Operasional</h4>
+                <ul class="hours-list">
+                    <li><i class="fas fa-clock"></i> Senin - Kamis: 07.30 - 16.00</li>
+                    <li><i class="fas fa-clock"></i> Jumat: 07.30 - 11.30</li>
+                    <li><i class="fas fa-clock"></i> Sabtu - Minggu: Libur</li>
+                </ul>
             </div>
         </div>
-        <div class="footer-bottom"><div class="footer-bottom-content"><p>&copy; 2026 Dinas Lingkungan Hidup Kabupaten Bojonegoro - All Rights Reserved</p><p>Sistem Informasi Pengaduan Sampah Online</p></div></div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>© 2024 Dinas Lingkungan Hidup Kabupaten Bojonegoro. Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
