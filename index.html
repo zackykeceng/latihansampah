@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>DLH Bojonegoro - Sistem Informasi Pengaduan Sampah</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -145,10 +145,81 @@
             margin-top: 3rem;
             color: #64748b;
         }
+        
+        /* === ADMIN SECRET BUTTON (Tersembunyi di pojok kanan bawah) === */
+        .admin-secret {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            background: rgba(16, 185, 129, 0.12);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 999;
+            opacity: 0.25;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            text-decoration: none;
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+        .admin-secret:hover {
+            opacity: 0.6;
+            background: rgba(16, 185, 129, 0.25);
+            transform: scale(1.02);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        /* Ikon kecil tanpa teks agar tidak mencolok */
+        .admin-secret i {
+            font-size: 1.35rem;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+        }
+        
+        /* Tooltip halus hanya saat hover (opsional, tidak mengganggu) */
+        .admin-secret::after {
+            content: "Admin Panel";
+            position: absolute;
+            bottom: 50px;
+            right: 0;
+            background: #1e293b;
+            color: #cbd5e1;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-secret:hover::after {
+            opacity: 0.7;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .container { padding: 1rem; }
             .stats { gap: 1.5rem; }
+            .admin-secret {
+                width: 38px;
+                height: 38px;
+                bottom: 12px;
+                right: 12px;
+            }
+            .admin-secret i {
+                font-size: 1.1rem;
+            }
+            .admin-secret::after {
+                font-size: 0.65rem;
+                bottom: 44px;
+            }
         }
     </style>
 </head>
@@ -172,6 +243,7 @@
             </p>
             
             <div class="card-grid">
+                <!-- KARTU LAPOR SAMPAH (PUBLIK) -->
                 <a href="public/" class="card">
                     <div class="card-icon">
                         <i class="fas fa-pen-alt"></i>
@@ -183,18 +255,11 @@
                     </span>
                 </a>
                 
-                <a href="admin/" class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <h3>🔐 Panel Admin</h3>
-                    <p>Kelola laporan, update status, dan pantau dashboard statistik.</p>
-                    <span class="card-badge">
-                        <i class="fas fa-lock"></i> Khusus Petugas DLH
-                    </span>
-                </a>
+                <!-- TIDAK MENAMPILKAN CARD ADMIN SECARA LANGSUNG DI GRID, 
+                     SEBALIKNYA MENGGUNAKAN ELEMEN TERSEMBUNYI DI POJOK BAWAH  -->
             </div>
             
+            <!-- Statistik realtime -->
             <div class="stats" id="stats">
                 <div class="stat">
                     <div class="stat-number" id="totalLaporan">—</div>
@@ -220,37 +285,57 @@
             </p>
         </div>
     </div>
+    
+    <!-- ADMIN AKSES: Tombol kecil tersembunyi di pojok kanan bawah (tidak mengganggu UI, bahkan nyaris tak terlihat) -->
+    <a href="admin/" class="admin-secret" aria-label="Panel Admin (tersembunyi)">
+        <i class="fas fa-user-shield"></i>
+    </a>
 
     <script>
         // Ambil statistik dari Google Apps Script untuk ditampilkan di landing page
+        // Gunakan endpoint yang sama seperti semula (bisa disesuaikan dengan URL GAS asli)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNuMWcwD4itLwsQJmCpdrS9gnfBZzr3B8lA8lphS3Crx2A9VfzfSWBxMPNZ-Dd97ky/exec';
         
         async function loadStats() {
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=get`);
+                // Perhatikan: jika script membutuhkan mode CORS atau response tidak sesuai, fallback sudah disiapkan.
                 const data = await response.json();
                 
                 if (data.success && data.data) {
                     const laporan = data.data;
                     const total = laporan.length;
                     const selesai = laporan.filter(l => l.status === 'selesai').length;
-                    const proses = laporan.filter(l => l.status === 'proses').length;
+                    const proses = laporan.filter(l => l.status === 'proses' || l.status === 'diproses').length;
                     
                     document.getElementById('totalLaporan').textContent = total;
                     document.getElementById('selesaiLaporan').textContent = selesai;
                     document.getElementById('prosesLaporan').textContent = proses;
+                } else {
+                    // Jika struktur data tidak sesuai, coba alternate atau tampilkan 0 (masih aman)
+                    fallbackStats();
                 }
             } catch (error) {
                 console.error('Gagal load statistik:', error);
-                document.getElementById('totalLaporan').textContent = '0';
-                document.getElementById('selesaiLaporan').textContent = '0';
-                document.getElementById('prosesLaporan').textContent = '0';
+                fallbackStats();
             }
         }
         
+        function fallbackStats() {
+            // Menampilkan nilai default saat gagal fetch atau tidak ada data
+            document.getElementById('totalLaporan').textContent = '0';
+            document.getElementById('selesaiLaporan').textContent = '0';
+            document.getElementById('prosesLaporan').textContent = '0';
+        }
+        
+        // Inisialisasi pertama
         loadStats();
-        // Refresh setiap 30 detik
+        // Refresh setiap 30 detik untuk update statistik
         setInterval(loadStats, 30000);
+        
+        // Optional: Jika ingin efek interaksi tambahan, biarkan sederhana. Tombol admin sudah tersembunyi dengan elegan.
+        // Fungsi tambahan untuk mencegah klik kanan / debugging tidak diperlukan agar tetap ramah pengguna.
+        // Tidak ada perubahan struktural besar pada style/card, hanya admin dipindah ke pojok kanan bawah dan disembunyikan.
     </script>
 </body>
 </html>
