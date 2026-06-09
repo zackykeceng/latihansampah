@@ -57,7 +57,6 @@ body {
     }
 }
 
-/* ==================== CUSTOM CURSOR ==================== */
 .cursor-dot {
     width: 6px;
     height: 6px;
@@ -92,7 +91,6 @@ body {
     }
 }
 
-/* ==================== LOADER ==================== */
 .loader {
     position: fixed;
     top: 0;
@@ -152,7 +150,6 @@ body {
     50% { transform: translate(-50%, -50%) scale(1.2); }
 }
 
-/* ==================== SCROLLBAR ==================== */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -170,7 +167,6 @@ body {
     background: var(--primary-dark);
 }
 
-/* ==================== SCROLL TOP ==================== */
 .scroll-top {
     position: fixed;
     bottom: 30px;
@@ -202,7 +198,6 @@ body {
     box-shadow: var(--shadow-xl);
 }
 
-/* ==================== NAVBAR ==================== */
 .navbar {
     position: fixed;
     top: 0;
@@ -325,7 +320,6 @@ body {
     color: white;
 }
 
-/* ==================== HERO SECTION ==================== */
 .hero {
     position: relative;
     min-height: 100vh;
@@ -545,14 +539,12 @@ body {
     height: 60px;
 }
 
-/* ==================== CONTAINER ==================== */
 .container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
-/* ==================== SECTION ==================== */
 .section {
     margin-bottom: 6rem;
 }
@@ -633,7 +625,6 @@ body {
     margin: 0 auto;
 }
 
-/* ==================== FORM SECTION ==================== */
 .form-card {
     background: white;
     border-radius: var(--radius-2xl);
@@ -1035,7 +1026,6 @@ textarea {
     cursor: not-allowed;
 }
 
-/* ==================== MAP SECTION ==================== */
 .map-container {
     position: relative;
 }
@@ -1071,31 +1061,6 @@ textarea {
     font-size: 1.2rem;
 }
 
-.map-legend {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-}
-
-.legend-color {
-    width: 20px;
-    height: 20px;
-    border-radius: var(--radius-xs);
-}
-
-.legend-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
 #map {
     height: 500px;
     width: 100%;
@@ -1114,15 +1079,14 @@ textarea {
     gap: 8px;
 }
 
-/* ==================== MARKER KATEGORI STYLES ==================== */
 .kategori-marker {
     transition: transform 0.2s ease, filter 0.2s ease;
     z-index: 10;
 }
 
 .kategori-marker:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));
+    transform: scale(1.2);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
     z-index: 1000;
 }
 
@@ -1136,15 +1100,6 @@ textarea {
     animation: markerPopIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
 }
 
-.marker-ring {
-    transition: all 0.3s ease;
-}
-
-.marker-ring:hover {
-    transform: scale(1.15);
-}
-
-/* Custom popup styling */
 .leaflet-popup-content-wrapper {
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -1161,7 +1116,6 @@ textarea {
     min-width: 260px;
 }
 
-/* Animasi fade untuk popup */
 @keyframes popupFadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1171,7 +1125,6 @@ textarea {
     animation: popupFadeIn 0.2s ease;
 }
 
-/* Tombol lokasi saya di peta */
 #btnLokasiSayaPeta {
     transition: all 0.3s ease;
 }
@@ -1180,7 +1133,6 @@ textarea {
     transform: scale(1.05);
 }
 
-/* ==================== FILTER CARD ==================== */
 .filter-card {
     background: white;
     border-radius: var(--radius-xl);
@@ -1271,7 +1223,6 @@ textarea {
     background: white;
 }
 
-/* ==================== LAPORAN GRID ==================== */
 .laporan-grid {
     display: grid;
     gap: 1.5rem;
@@ -1433,7 +1384,6 @@ textarea {
     gap: 6px;
 }
 
-/* ==================== INFO SECTION ==================== */
 .info-section {
     background: linear-gradient(135deg, white 0%, var(--light) 100%);
     border-radius: var(--radius-2xl);
@@ -1564,7 +1514,6 @@ textarea {
     color: var(--primary);
 }
 
-/* ==================== FOOTER ==================== */
 .footer {
     background: var(--dark);
     color: white;
@@ -1696,7 +1645,6 @@ textarea {
     opacity: 0.7;
 }
 
-/* ==================== NOTIFICATION ==================== */
 .notifikasi {
     position: fixed;
     top: 100px;
@@ -1750,7 +1698,6 @@ textarea {
     }
 }
 
-/* ==================== MAP CUSTOM STYLES ==================== */
 .custom-div-icon {
     background: transparent;
     border: none;
@@ -1764,7 +1711,6 @@ textarea {
     fill-opacity: 0.15;
 }
 
-/* ==================== LIVE GPS TRACKING UI ==================== */
 .live-gps-icon {
     background: transparent;
     border: none;
@@ -1845,40 +1791,32 @@ textarea {
     50%       { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
 }
 
-/* ==================== USER LOCATION PULSE ==================== */
 @keyframes userPulse {
     0% { transform: scale(1); opacity: 0.8; }
     70% { transform: scale(2.8); opacity: 0; }
     100% { transform: scale(1); opacity: 0; }
 }
 
-/* ==================== RESPONSIVE ==================== */
 @media (max-width: 968px) {
     .hero-title {
         font-size: 3rem;
     }
-    
     .section-title {
         font-size: 2rem;
     }
-    
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
     .filter-body {
         flex-direction: column;
     }
-    
     .filter-group {
         flex-direction: column;
     }
-    
     .filter-select {
         width: 100%;
     }
-    
     .info-section {
         padding: 2rem;
     }
@@ -1888,7 +1826,6 @@ textarea {
     .nav-toggle {
         display: flex;
     }
-    
     .nav-links {
         position: fixed;
         top: 80px;
@@ -1904,80 +1841,62 @@ textarea {
         z-index: 999;
         gap: 1rem;
     }
-    
     .nav-links.active {
         left: 0;
     }
-    
     .nav-link {
         width: 100%;
         justify-content: center;
     }
-    
     .hero-title {
         font-size: 2rem;
     }
-    
     .hero-stats {
         gap: 1rem;
     }
-    
     .stat-item {
         padding: 0.75rem 1rem;
     }
-    
     .stat-number {
         font-size: 1.25rem;
     }
-    
     .container {
         padding: 0 1rem;
     }
-    
     .section {
         margin-bottom: 3rem;
     }
-    
     .form-row {
         grid-template-columns: 1fr;
     }
-    
     .volume-selector {
         flex-direction: column;
     }
-    
     .laporan-header {
         flex-direction: column;
         text-align: center;
     }
-    
     .laporan-footer {
         flex-direction: column;
         text-align: center;
     }
-    
     .map-header {
         flex-direction: column;
         text-align: center;
     }
-    
     .progress-steps {
         display: none;
     }
-    
     .progress-bar {
         display: none;
     }
-    
     .form-navigation {
         flex-direction: column;
     }
-    
     .btn-next, .btn-prev {
         width: 100%;
         justify-content: center;
     }
-    
     #map {
         height: 400px;
     }
@@ -1987,36 +1906,29 @@ textarea {
     .hero-title {
         font-size: 1.5rem;
     }
-    
     .hero-badge {
         font-size: 0.7rem;
         padding: 0.5rem 1rem;
     }
-    
     .btn-primary, .btn-secondary {
         width: 100%;
         justify-content: center;
     }
-    
     .section-title {
         font-size: 1.5rem;
     }
-    
     .section-icon {
         width: 50px;
         height: 50px;
     }
-    
     .section-icon i {
         font-size: 1.3rem;
     }
-    
     #map {
         height: 350px;
     }
 }
 
-/* ==================== ERROR HIGHLIGHT EFFECTS ==================== */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
