@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzv3v-tiTccrswwn1q7DqTaBtae4jYORh9Dogr6Y5k4ZsccWdwDdG-3_xs49E0bFTMc/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 // Koordinat berdasarkan batas administrasi resmi (BPS/OSM) Kab. Bojonegoro
@@ -133,8 +133,6 @@ let allLaporan = [];
 let wilayahPolygons = [];
 let currentStep = 1;
 let autoRefreshInterval = null;
-// Marker sementara sebelum data server tiba
-let tempSubmitMarker = null;
 
 // DOM Elements
 const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -913,32 +911,9 @@ async function submitLaporan(e) {
             })
         });
 
-        // Simpan nilai sebelum reset (reset akan null-kan selectedLat/Lng)
-        const _submitLat = selectedLat;
-        const _submitLng = selectedLng;
-        const _submitKec = currentKecamatan;
-        const _kategori  = kategori;
-        const _nama      = nama;
-        const _deskripsi = deskripsi;
-
-        // ── Tampilkan marker sementara SEGERA di peta ──────────────────────
-        addTempMarkerToMap(_submitLat, _submitLng, _kategori, _nama, _deskripsi, _submitKec);
-
-        showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${_submitKec}!`, 'sukses');
-
+        showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
         resetFormToStep1();
-
-        // Refresh data dari server setelah 3 detik
-        setTimeout(async () => {
-            await loadLaporan();
-        }, 3000);
-
-        // Scroll ke peta dan tunjukkan notifikasi marker
-        setTimeout(() => {
-            const petaSection = document.getElementById('peta');
-            if (petaSection) petaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            showNotification(`📍 Marker ${KATEGORI_ICON_MAP[_kategori]?.emoji || '📦'} telah ditambahkan ke peta sebaran!`, 'info');
-        }, 1500);
+        setTimeout(() => loadLaporan(), 2000);
 
     } catch (error) {
         console.error('Error:', error);
@@ -949,121 +924,6 @@ async function submitLaporan(e) {
             submitBtn.innerHTML = '<span>Kirim Laporan</span><i class="fas fa-paper-plane"></i>';
         }
     }
-}
-
-
-// ==================== MARKER SEMENTARA ====================
-function addTempMarkerToMap(lat, lng, kategori, nama, deskripsi, kecamatan) {
-    if (!map) return;
-
-    // Hapus marker sementara sebelumnya
-    if (tempSubmitMarker) {
-        map.removeLayer(tempSubmitMarker);
-        tempSubmitMarker = null;
-    }
-
-    const meta = KATEGORI_ICON_MAP[kategori] || KATEGORI_ICON_MAP['lainnya'];
-
-    // Inject CSS animasi sekali saja
-    if (!document.getElementById('tempMarkerStyle')) {
-        const style = document.createElement('style');
-        style.id = 'tempMarkerStyle';
-        style.textContent = `
-            @keyframes markerPopIn {
-                0%   { transform: scale(0) translateY(20px); opacity: 0; }
-                60%  { transform: scale(1.15) translateY(-4px); opacity: 1; }
-                100% { transform: scale(1) translateY(0); opacity: 1; }
-            }
-            @keyframes tempMarkerPulse {
-                0%   { transform: scale(0.8); opacity: 0.8; }
-                100% { transform: scale(2.2); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    const tempIcon = L.divIcon({
-        className: '',
-        html: `
-            <div style="
-                position:relative; width:50px; height:50px;
-                display:flex; align-items:center; justify-content:center;
-                animation:markerPopIn 0.5s cubic-bezier(0.34,1.4,0.64,1) forwards;
-            ">
-                <div style="
-                    position:absolute; inset:-3px; border-radius:50%;
-                    background:${meta.color}22;
-                    border:2.5px solid ${meta.color};
-                    box-shadow:0 0 0 4px ${meta.color}33, 0 4px 12px ${meta.color}55;
-                "></div>
-                <div style="
-                    position:absolute; inset:0; border-radius:50%;
-                    background:${meta.bg};
-                    border:2px solid ${meta.color};
-                    display:flex; align-items:center; justify-content:center;
-                ">
-                    <span style="font-size:22px; line-height:1;">${meta.emoji}</span>
-                </div>
-                <div style="
-                    position:absolute; top:-8px; right:-8px;
-                    background:#ef4444; color:white;
-                    font-size:8px; font-weight:700;
-                    padding:2px 5px; border-radius:6px;
-                    border:1.5px solid white;
-                    box-shadow:0 2px 4px rgba(0,0,0,0.2);
-                    white-space:nowrap; z-index:10;
-                ">BARU</div>
-                <div style="
-                    position:absolute; inset:-8px; border-radius:50%;
-                    border:2px solid ${meta.color};
-                    opacity:0;
-                    animation:tempMarkerPulse 1.5s ease-out infinite;
-                "></div>
-            </div>`,
-        iconSize:    [50, 50],
-        iconAnchor:  [25, 25],
-        popupAnchor: [0, -28]
-    });
-
-    const popupContent = `
-        <div style="min-width:240px;max-width:300px;font-family:'Inter',sans-serif;padding:4px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">
-                <div style="width:38px;height:38px;background:${meta.bg};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">${meta.emoji}</div>
-                <div>
-                    <div style="font-weight:800;font-size:13px;color:#1e293b;">${meta.label}</div>
-                    <div style="font-size:11px;">
-                        <span style="background:#fef3c7;color:#d97706;padding:1px 6px;border-radius:20px;font-weight:600;">
-                            ⏳ Baru Dikirim
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                <i class="fas fa-user" style="color:#10b981;width:14px;font-size:11px;"></i>
-                <span style="font-weight:600;font-size:12px;">${escapeHtml(nama)}</span>
-            </div>
-            ${kecamatan ? \`<div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                <i class="fas fa-building" style="color:#10b981;width:14px;font-size:11px;"></i>
-                <span style="font-size:11px;color:#475569;">${escapeHtml(kecamatan)}</span>
-            </div>\` : ''}
-            <div style="margin-bottom:8px;display:flex;align-items:flex-start;gap:8px;">
-                <i class="fas fa-align-left" style="color:#10b981;width:14px;font-size:11px;margin-top:2px;"></i>
-                <span style="font-size:11px;color:#475569;line-height:1.5;">${escapeHtml(deskripsi.substring(0, 100))}${deskripsi.length > 100 ? '\u2026' : ''}</span>
-            </div>
-            <hr style="margin:8px 0;border-color:#e2e8f0;">
-            <div style="font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:6px;">
-                <i class="fas fa-clock"></i>
-                <span>Baru saja dikirim — menunggu sinkronisasi server</span>
-            </div>
-        </div>`;
-
-    tempSubmitMarker = L.marker([lat, lng], { icon: tempIcon, zIndexOffset: 2000 })
-        .addTo(map)
-        .bindPopup(popupContent)
-        .openPopup();
-
-    // Fly ke marker baru
-    map.flyTo([lat, lng], 16, { duration: 1.5 });
 }
 
 // Kompres foto ke max 1200px JPEG 80% sebelum dikirim
@@ -1412,19 +1272,19 @@ function startUserLocationOnMap() {
 function updateMapMarkers(laporan) {
     if (!map) return;
     
-    // Kumpulkan dulu, baru hapus (hindari mutasi saat iterasi)
-    const layersToRemove = [];
+    // Hapus semua marker laporan (bukan marker form & bukan user location)
     map.eachLayer(layer => {
-        if (layer instanceof L.Marker && layer !== marker && layer !== userLocationMarker) {
-            layersToRemove.push(layer);
+        if (
+            layer instanceof L.Marker &&
+            layer !== marker &&
+            layer !== userLocationMarker
+        ) {
+            map.removeLayer(layer);
         }
-        if (layer instanceof L.Circle && layer !== userLocationCircle && layer !== liveCircle) {
-            layersToRemove.push(layer);
+        if (layer instanceof L.Circle && layer !== userLocationCircle) {
+            map.removeLayer(layer);
         }
     });
-    layersToRemove.forEach(layer => map.removeLayer(layer));
-    // Marker sementara sudah terhapus di atas — reset referensi
-    tempSubmitMarker = null;
     
     // Redraw polygons if needed
     if (wilayahPolygons.length === 0) {
@@ -1635,16 +1495,13 @@ function showNotification(message, type) {
     
     const notif = document.createElement('div');
     notif.className = `notifikasi ${type}`;
-    notif.innerHTML = `<i class="fas ${type === 'sukses' ? 'fa-check-circle' : (type === 'info' ? 'fa-info-circle' : 'fa-exclamation-circle')}"></i> ${escapeHtml(message)}`;
+    notif.innerHTML = `<i class="fas ${type === 'sukses' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${escapeHtml(message)}`;
     document.body.appendChild(notif);
     
-    notif.addEventListener('click', () => notif.remove());
     setTimeout(() => {
-        if (notif.parentNode) {
-            notif.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notif.remove(), 300);
-        }
-    }, 5000);
+        notif.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notif.remove(), 300);
+    }, 4000);
 }
 
 function escapeHtml(text) {
