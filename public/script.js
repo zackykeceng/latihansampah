@@ -30,11 +30,9 @@ const KATEGORI_ICON_MAP = {
     'lainnya': { emoji: '📦', color: '#10b981', bg: '#ecfdf5', label: 'Lainnya' }
 };
 
-// Fungsi untuk mendapatkan ikon marker berdasarkan kategori
 function getKategoriMarkerIcon(kategori, status) {
     const meta = KATEGORI_ICON_MAP[kategori] || KATEGORI_ICON_MAP['lainnya'];
     const statusColor = status === 'selesai' ? '#10b981' : (status === 'proses' ? '#3b82f6' : '#f59e0b');
-    
     return L.divIcon({
         className: 'kategori-marker',
         html: `<div style="position:relative;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
@@ -151,34 +149,6 @@ function drawWilayahPolygons() {
         polygon.on('mouseout', function() { polygon.setStyle({ fillOpacity: 0.15 }); });
         wilayahPolygons.push(polygon);
     });
-    
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML = `<div style="background:white;padding:12px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:12px;min-width:220px;">
-            <strong style="display:block;margin-bottom:8px;color:#0f172a;">🗺️ Wilayah Layanan DLH</strong>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-                <div style="width:20px;height:20px;background:#10b981;opacity:0.3;border:2px solid #10b981;border-radius:4px;"></div>
-                <span>Kec. Ngambon & Tambakrejo</span>
-            </div>
-            <hr style="margin:8px 0;">
-            <div style="margin-bottom:6px;"><strong>🏷️ Kategori Sampah:</strong></div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
-                ${Object.entries(KATEGORI_ICON_MAP).map(([key, val]) => `<div style="display:inline-flex;align-items:center;gap:4px;background:${val.bg};padding:2px 8px;border-radius:20px;"><span>${val.emoji}</span><span style="font-size:10px;">${val.label}</span></div>`).join('')}
-            </div>
-            <hr style="margin:8px 0;">
-            <div style="display:flex;align-items:center;gap:8px;">
-                <div style="width:12px;height:12px;border-radius:50%;background:#f59e0b;box-shadow:0 0 0 2px #fff,0 0 0 3px #f59e0b;"></div>
-                <span>Belum Diproses</span>
-                <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;box-shadow:0 0 0 2px #fff,0 0 0 3px #3b82f6;margin-left:8px;"></div>
-                <span>Diproses</span>
-                <div style="width:12px;height:12px;border-radius:50%;background:#10b981;box-shadow:0 0 0 2px #fff,0 0 0 3px #10b981;margin-left:8px;"></div>
-                <span>Selesai</span>
-            </div>
-        </div>`;
-        return div;
-    };
-    legend.addTo(map);
 }
 
 function isPointInPolygon(lat, lng, polygon) {
@@ -421,7 +391,6 @@ async function submitLaporan(e) {
     if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim ke DLH...'; }
     
     try {
-        // Kirim data teks terlebih dahulu
         const params = new URLSearchParams({
             action: 'submit',
             timestamp: timestamp,
@@ -441,19 +410,15 @@ async function submitLaporan(e) {
         
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
         
-        // Kirim foto
         if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah foto...';
         const fotoBase64 = await compressAndConvertToBase64(foto);
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'upload_foto', timestamp: timestamp, foto: fotoBase64 }) });
         
         showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
         resetFormToStep1();
-        
-        // Load ulang data untuk menampilkan marker baru
         await loadLaporan();
         showNotification(`📍 Marker ${meta.emoji} ${meta.label} telah muncul di peta sebaran`, 'info');
         
-        // Scroll ke peta agar user melihat markernya
         setTimeout(() => { const petaSection = document.getElementById('peta'); if (petaSection) petaSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1500);
         
     } catch (error) { 
@@ -494,7 +459,7 @@ async function loadLaporan() {
         const response = await fetch(`${SCRIPT_URL}?action=get`);
         const data = await response.json();
         
-        console.log('Data dari server:', data); // Debug: lihat di console browser
+        console.log('Data dari server:', data);
         
         if (data && data.success && data.data && data.data.length > 0) { 
             allLaporan = data.data.reverse(); 
@@ -504,7 +469,6 @@ async function loadLaporan() {
         } else { 
             if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-inbox" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i><p>Belum ada laporan. Jadilah yang pertama!</p></div>'; 
             updateStats();
-            // Tetap coba update map markers meskipun data kosong
             updateMapMarkers([]);
         }
     } catch (error) { 
@@ -602,7 +566,6 @@ function updateMapMarkers(laporan) {
     let markerCount = 0;
     
     laporan.forEach(l => {
-        // Cek apakah ada latitude dan longitude yang valid
         if (!l.latitude || !l.longitude) {
             console.log('Laporan tanpa koordinat:', l);
             return;
@@ -615,6 +578,8 @@ function updateMapMarkers(laporan) {
             console.log('Koordinat tidak valid:', l.latitude, l.longitude);
             return;
         }
+        
+        console.log(`Menambahkan marker di [${lat}, ${lng}] untuk kategori: ${l.kategori}`);
         
         const meta = KATEGORI_ICON_MAP[l.kategori] || KATEGORI_ICON_MAP['lainnya'];
         const statusText = l.status === 'belum diproses' ? '<span style="color:#f59e0b">⏳ Menunggu Verifikasi</span>' : (l.status === 'proses' ? '<span style="color:#3b82f6">🔄 Sedang Diproses DLH</span>' : '<span style="color:#10b981">✅ Selesai Ditangani</span>');
@@ -642,7 +607,6 @@ function updateMapMarkers(laporan) {
     
     console.log('Berhasil menambahkan', markerCount, 'marker ke peta');
     
-    // Aktifkan lokasi real-time user di peta sebaran
     startUserLocationOnMap();
 }
 
@@ -663,7 +627,7 @@ function startUserLocationOnMap() {
         btn.onmouseenter = () => { btn.style.background = '#10b981'; btn.style.color = '#fff'; };
         btn.onmouseleave = () => { btn.style.background = '#fff'; btn.style.color = '#10b981'; };
         btn.onclick = () => { if (userLocationMarker) map.flyTo(userLocationMarker.getLatLng(), 16, { duration: 1.2 }); else showNotification('Mengaktifkan lokasi real-time…', 'sukses'); };
-        const mapEl = document.getElementById('petaSebaran') || document.getElementById('map');
+        const mapEl = document.getElementById('map');
         if (mapEl) mapEl.style.position = 'relative';
         if (mapEl) mapEl.appendChild(btn);
     }
