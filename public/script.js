@@ -2,48 +2,22 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
-// Koordinat berdasarkan batas administrasi resmi (BPS/OSM) Kab. Bojonegoro
 const WILAYAH = {
     ngambon: {
         name: 'Kecamatan Ngambon',
-        // Pusat ibu kota kecamatan Ngambon
         center: [-7.2853, 111.7198],
         polygons: [
             [
-                // Batas utara — lereng Pegunungan Kapur Utara
-                [-7.2480, 111.6880],
-                [-7.2495, 111.6960],
-                [-7.2515, 111.7040],
-                [-7.2540, 111.7110],
-                [-7.2568, 111.7175],
-                [-7.2600, 111.7240],
-                [-7.2630, 111.7305],
-                [-7.2660, 111.7368],
-                // Batas timur
-                [-7.2705, 111.7420],
-                [-7.2760, 111.7460],
-                [-7.2820, 111.7478],
-                [-7.2880, 111.7465],
-                [-7.2935, 111.7430],
-                [-7.2978, 111.7378],
-                [-7.3010, 111.7310],
-                // Batas selatan — diperluas ke selatan
-                [-7.3055, 111.7240],
-                [-7.3068, 111.7163],
-                [-7.3060, 111.7083],
-                [-7.3040, 111.7005],
-                [-7.3010, 111.6935],
-                [-7.2968, 111.6875],
-                [-7.2920, 111.6828],
-                // Batas barat — diperluas ke barat sesuai garis
-                [-7.2865, 111.6793],
-                [-7.2803, 111.6775],
-                [-7.2738, 111.6778],
-                [-7.2675, 111.6793],
-                [-7.2618, 111.6813],
-                [-7.2565, 111.6833],
-                [-7.2525, 111.6850],
-                [-7.2495, 111.6862],
+                [-7.2480, 111.6880], [-7.2495, 111.6960], [-7.2515, 111.7040],
+                [-7.2540, 111.7110], [-7.2568, 111.7175], [-7.2600, 111.7240],
+                [-7.2630, 111.7305], [-7.2660, 111.7368], [-7.2705, 111.7420],
+                [-7.2760, 111.7460], [-7.2820, 111.7478], [-7.2880, 111.7465],
+                [-7.2935, 111.7430], [-7.2978, 111.7378], [-7.3010, 111.7310],
+                [-7.3055, 111.7240], [-7.3068, 111.7163], [-7.3060, 111.7083],
+                [-7.3040, 111.7005], [-7.3010, 111.6935], [-7.2968, 111.6875],
+                [-7.2920, 111.6828], [-7.2865, 111.6793], [-7.2803, 111.6775],
+                [-7.2738, 111.6778], [-7.2675, 111.6793], [-7.2618, 111.6813],
+                [-7.2565, 111.6833], [-7.2525, 111.6850], [-7.2495, 111.6862],
                 [-7.2480, 111.6880]
             ]
         ],
@@ -51,62 +25,26 @@ const WILAYAH = {
     },
     tambakrejo: {
         name: 'Kecamatan Tambakrejo',
-        // Pusat ibu kota kecamatan Tambakrejo
         center: [-7.2645, 111.6198],
         polygons: [
             [
-                // Batas utara — berbatasan Kec. Margomulyo & Ngraho
-                [-7.2130, 111.5840],
-                [-7.2160, 111.5930],
-                [-7.2200, 111.6025],
-                [-7.2240, 111.6115],
-                [-7.2278, 111.6200],
-                [-7.2315, 111.6285],
-                [-7.2348, 111.6365],
-                [-7.2370, 111.6460],
-                [-7.2390, 111.6560],
-                [-7.2405, 111.6660],
-                [-7.2415, 111.6760],
-                // Pojok timur laut — melewati Turi ke atas
-                [-7.2420, 111.6870],
-                [-7.2430, 111.6940],
-                // Sambung mulus ke batas barat Ngambon
-                [-7.2480, 111.6880],
-                [-7.2495, 111.6862],
-                [-7.2525, 111.6850],
-                [-7.2565, 111.6833],
-                [-7.2618, 111.6813],
-                [-7.2675, 111.6793],
-                // Batas tenggara — melingkupi Turi dari timur & selatan
-                [-7.2720, 111.6760],
-                [-7.2760, 111.6720],
-                [-7.2800, 111.6670],
-                [-7.2838, 111.6600],
-                [-7.2865, 111.6515],
-                [-7.2883, 111.6420],
-                // Batas selatan
-                [-7.2898, 111.6325],
-                [-7.2903, 111.6225],
-                [-7.2890, 111.6130],
-                [-7.2868, 111.6042],
-                [-7.2835, 111.5968],
-                [-7.2795, 111.5910],
-                // Batas barat — Bengawan Solo
-                [-7.2745, 111.5868],
-                [-7.2690, 111.5838],
-                [-7.2630, 111.5822],
-                [-7.2567, 111.5818],
-                [-7.2500, 111.5822],
-                [-7.2430, 111.5825],
-                [-7.2360, 111.5823],
-                [-7.2290, 111.5820],
-                [-7.2217, 111.5825],
-                [-7.2165, 111.5832],
-                [-7.2130, 111.5840]
+                [-7.2130, 111.5840], [-7.2160, 111.5930], [-7.2200, 111.6025],
+                [-7.2240, 111.6115], [-7.2278, 111.6200], [-7.2315, 111.6285],
+                [-7.2348, 111.6365], [-7.2370, 111.6460], [-7.2390, 111.6560],
+                [-7.2405, 111.6660], [-7.2415, 111.6760], [-7.2420, 111.6870],
+                [-7.2430, 111.6940], [-7.2480, 111.6880], [-7.2495, 111.6862],
+                [-7.2525, 111.6850], [-7.2565, 111.6833], [-7.2618, 111.6813],
+                [-7.2675, 111.6793], [-7.2720, 111.6760], [-7.2760, 111.6720],
+                [-7.2800, 111.6670], [-7.2838, 111.6600], [-7.2865, 111.6515],
+                [-7.2883, 111.6420], [-7.2898, 111.6325], [-7.2903, 111.6225],
+                [-7.2890, 111.6130], [-7.2868, 111.6042], [-7.2835, 111.5968],
+                [-7.2795, 111.5910], [-7.2745, 111.5868], [-7.2690, 111.5838],
+                [-7.2630, 111.5822], [-7.2567, 111.5818], [-7.2500, 111.5822],
+                [-7.2430, 111.5825], [-7.2360, 111.5823], [-7.2290, 111.5820],
+                [-7.2217, 111.5825], [-7.2165, 111.5832], [-7.2130, 111.5840]
             ]
         ],
-        villages: [
-            'Tambakrejo', 'Sukorejo', 'Sendangrejo', 'Pengkol', 'Ngrancang',
+        villages: ['Tambakrejo', 'Sukorejo', 'Sendangrejo', 'Pengkol', 'Ngrancang',
             'Napis', 'Mulyorejo', 'Malingmati', 'Kalisumber', 'Tanjung',
             'Dolokgede', 'Gading', 'Gamongan', 'Jatimulyo', 'Jawik',
             'Kacangan', 'Bakalan', 'Turi'
@@ -114,7 +52,6 @@ const WILAYAH = {
     }
 };
 
-// Batas kotak (bounding box) mencakup kedua kecamatan
 const BATAS_WILAYAH = {
     latMin: -7.3090,
     latMax: -7.2100,
@@ -152,13 +89,11 @@ const searchClear = document.getElementById('searchClear');
 
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Hide loader after 1 second
     setTimeout(() => {
         const loader = document.getElementById('loader');
         if (loader) loader.classList.add('hide');
     }, 1000);
     
-    // Initialize AOS
     if (typeof AOS !== 'undefined') {
         AOS.init({
             duration: 1000,
@@ -168,27 +103,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // Initialize custom cursor (only for desktop)
     if (window.innerWidth > 768) {
         initCustomCursor();
     }
     
-    // Initialize particles
     initParticles();
-    
-    // Initialize map
     initMap();
-    
-    // Load data
     await loadLaporan();
-    
-    // Setup event listeners
     setupEventListeners();
     setupScrollEffect();
     setupFormSteps();
     setupVolumeSelector();
     
-    // Auto refresh every 30 seconds
     if (autoRefreshInterval) clearInterval(autoRefreshInterval);
     autoRefreshInterval = setInterval(() => {
         loadLaporan();
@@ -224,7 +150,6 @@ function initParticles() {
     const particlesContainer = document.getElementById('heroParticles');
     if (!particlesContainer) return;
     
-    // Clear existing particles
     particlesContainer.innerHTML = '';
     
     for (let i = 0; i < 50; i++) {
@@ -290,7 +215,6 @@ function drawWilayahPolygons() {
         className: 'area-polygon'
     };
     
-    // Draw Ngambon
     WILAYAH.ngambon.polygons.forEach(polygonCoords => {
         const polygon = L.polygon(polygonCoords, polygonStyle).addTo(map);
         polygon.bindPopup(`
@@ -305,7 +229,6 @@ function drawWilayahPolygons() {
         wilayahPolygons.push(polygon);
     });
     
-    // Draw Tambakrejo
     WILAYAH.tambakrejo.polygons.forEach(polygonCoords => {
         const polygon = L.polygon(polygonCoords, polygonStyle).addTo(map);
         polygon.bindPopup(`
@@ -320,7 +243,6 @@ function drawWilayahPolygons() {
         wilayahPolygons.push(polygon);
     });
     
-    // Add legend
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function() {
         const div = L.DomUtil.create('div', 'info legend');
@@ -400,7 +322,6 @@ function updateSelectedLocation(lat, lng) {
             locationStatus.innerHTML = `<i class="fas fa-check-circle"></i> ✅ Lokasi valid di ${validasi.kecamatan} - Dalam wilayah layanan DLH Bojonegoro`;
             showNotification(`Lokasi terverifikasi di ${validasi.kecamatan}`, 'sukses');
             
-            // Update hidden kecamatan field
             let hiddenKecamatan = document.getElementById('kecamatanOtomatis');
             if (!hiddenKecamatan) {
                 hiddenKecamatan = document.createElement('input');
@@ -419,8 +340,8 @@ function updateSelectedLocation(lat, lng) {
 
 // ==================== LIVE GPS TRACKING ====================
 let liveWatchId = null;
-let liveCircle   = null;   // accuracy radius circle on map
-let liveMarkerEl = null;   // pulsing blue dot icon
+let liveCircle = null;
+let liveMarkerEl = null;
 
 function startLiveTracking() {
     if (!navigator.geolocation) {
@@ -435,35 +356,29 @@ function startLiveTracking() {
         btn.classList.add('btn-tracking');
     }
 
-    // Stop previous watch if any
     if (liveWatchId !== null) {
         navigator.geolocation.clearWatch(liveWatchId);
         liveWatchId = null;
     }
 
-    // Live accuracy indicator in the location-status box
-    const validasiGroup    = document.getElementById('validasiLokasiGroup');
-    const locationStatus   = document.getElementById('locationStatus');
+    const validasiGroup = document.getElementById('validasiLokasiGroup');
+    const locationStatus = document.getElementById('locationStatus');
     if (validasiGroup) validasiGroup.style.display = 'block';
     if (locationStatus) {
         locationStatus.className = 'location-status loading';
-        locationStatus.innerHTML =
-            '<i class="fas fa-satellite-dish fa-pulse"></i> ' +
-            '<span id="gpsStatusText">Menghubungi satelit GPS… pastikan Anda berada di luar ruangan.</span>';
+        locationStatus.innerHTML = '<i class="fas fa-satellite-dish fa-pulse"></i> Menghubungi satelit GPS… pastikan Anda berada di luar ruangan.';
     }
 
     let firstFix = true;
 
     liveWatchId = navigator.geolocation.watchPosition(
         (pos) => {
-            const lat      = pos.coords.latitude;
-            const lng      = pos.coords.longitude;
-            const accuracy = pos.coords.accuracy;  // meters
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const accuracy = pos.coords.accuracy;
 
-            // Update map marker & selection
             updateSelectedLocation(lat, lng);
 
-            // Fly to position only on first fix; subsequent updates are subtle
             if (firstFix) {
                 map.flyTo([lat, lng], 16, { duration: 1.5 });
                 firstFix = false;
@@ -471,7 +386,6 @@ function startLiveTracking() {
                 map.setView([lat, lng], map.getZoom());
             }
 
-            // Draw / update accuracy circle
             if (liveCircle) {
                 liveCircle.setLatLng([lat, lng]);
                 liveCircle.setRadius(accuracy);
@@ -487,7 +401,6 @@ function startLiveTracking() {
                 }).addTo(map);
             }
 
-            // Swap main marker to pulsing blue GPS dot
             if (!liveMarkerEl) {
                 const liveIcon = L.divIcon({
                     className: 'live-gps-icon',
@@ -503,36 +416,35 @@ function startLiveTracking() {
                 liveMarkerEl = true;
             }
 
-            // Update accuracy pill in status bar
-            const qualityLabel = accuracy <= 10  ? '🟢 Presisi Tinggi' :
-                                 accuracy <= 30  ? '🟡 Presisi Baik' :
-                                 accuracy <= 80  ? '🟠 Presisi Sedang' :
+            const qualityLabel = accuracy <= 10 ? '🟢 Presisi Tinggi' :
+                                 accuracy <= 30 ? '🟡 Presisi Baik' :
+                                 accuracy <= 80 ? '🟠 Presisi Sedang' :
                                                    '🔴 Presisi Rendah';
-            const statusText = document.getElementById('gpsStatusText');
+            
             if (locationStatus && currentLocationValid) {
                 locationStatus.className = 'location-status valid gps-live';
-                locationStatus.innerHTML =
-                    `<i class="fas fa-satellite-dish"></i> ` +
-                    `<span id="gpsStatusText">` +
-                    `📡 <b>LIVE</b> · ${currentKecamatan} · ` +
-                    `Akurasi ±${Math.round(accuracy)} m &nbsp;${qualityLabel}</span> ` +
-                    `<button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking">` +
-                    `<i class="fas fa-stop-circle"></i></button>`;
+                locationStatus.innerHTML = `
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>📡 <b>LIVE</b> · ${currentKecamatan} · Akurasi ±${Math.round(accuracy)} m ${qualityLabel}</span>
+                    <button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking">
+                        <i class="fas fa-stop-circle"></i>
+                    </button>
+                `;
             } else if (locationStatus) {
                 locationStatus.className = 'location-status invalid gps-live';
-                locationStatus.innerHTML =
-                    `<i class="fas fa-triangle-exclamation"></i> ` +
-                    `<span id="gpsStatusText">` +
-                    `❌ Di luar wilayah layanan · Akurasi ±${Math.round(accuracy)} m</span> ` +
-                    `<button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking">` +
-                    `<i class="fas fa-stop-circle"></i></button>`;
+                locationStatus.innerHTML = `
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>❌ Di luar wilayah layanan · Akurasi ±${Math.round(accuracy)} m</span>
+                    <button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking">
+                        <i class="fas fa-stop-circle"></i>
+                    </button>
+                `;
             }
 
-            // Update button to "Stop Tracking"
             if (btn) {
                 btn.innerHTML = '<i class="fas fa-stop-circle"></i> Hentikan Tracking';
-                btn.disabled  = false;
-                btn.onclick   = stopLiveTracking;
+                btn.disabled = false;
+                btn.onclick = stopLiveTracking;
             }
         },
         (error) => {
@@ -558,8 +470,8 @@ function startLiveTracking() {
             }
         },
         {
-            enableHighAccuracy: true,   // request GPS chip
-            maximumAge: 0,              // always fresh
+            enableHighAccuracy: true,
+            maximumAge: 0,
             timeout: 15000
         }
     );
@@ -576,7 +488,6 @@ function stopLiveTracking() {
     }
     liveMarkerEl = null;
 
-    // Restore default green marker icon
     const defaultIcon = L.divIcon({
         className: 'custom-div-icon',
         html: '<i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 40px; text-shadow: 0 0 3px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>',
@@ -588,14 +499,13 @@ function stopLiveTracking() {
     const btn = document.getElementById('getLocationBtn');
     if (btn) {
         btn.innerHTML = '<i class="fas fa-location-dot"></i> Gunakan Lokasi Saya';
-        btn.disabled  = false;
+        btn.disabled = false;
         btn.classList.remove('btn-tracking');
-        btn.onclick   = startLiveTracking;
+        btn.onclick = startLiveTracking;
     }
     showNotification('Tracking GPS dihentikan. Lokasi terakhir tersimpan.', 'sukses');
 }
 
-// Alias for backward compat & event listener
 function getCurrentLocation() {
     startLiveTracking();
 }
@@ -636,13 +546,11 @@ function setupFormSteps() {
         btn.addEventListener('click', () => {
             const nextStep = parseInt(btn.dataset.next);
             if (validateStep(currentStep)) {
-                // Stop GPS tracking when leaving step 2
                 if (currentStep === 2 && typeof stopLiveTracking === 'function') {
                     stopLiveTracking();
                 }
                 currentStep = nextStep;
                 updateProgress(currentStep);
-                // Scroll ke atas form
                 const formCard = document.querySelector('.form-card');
                 if (formCard) {
                     formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -654,13 +562,11 @@ function setupFormSteps() {
     document.querySelectorAll('.btn-prev').forEach(btn => {
         btn.addEventListener('click', () => {
             const prevStep = parseInt(btn.dataset.prev);
-            // Stop GPS tracking when leaving step 2
             if (currentStep === 2 && typeof stopLiveTracking === 'function') {
                 stopLiveTracking();
             }
             currentStep = prevStep;
             updateProgress(currentStep);
-            // Scroll ke atas form
             const formCard = document.querySelector('.form-card');
             if (formCard) {
                 formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -669,7 +575,6 @@ function setupFormSteps() {
     });
     
     function validateStep(step) {
-        // Step 1: Validasi foto
         if (step === 1) {
             if (!fotoInput || !fotoInput.files || !fotoInput.files[0]) {
                 showNotification('📸 Harap unggah foto dokumentasi sampah terlebih dahulu', 'error');
@@ -686,7 +591,6 @@ function setupFormSteps() {
             return true;
         }
         
-        // Step 2: Validasi lokasi
         if (step === 2) {
             if (!selectedLat || !selectedLng) {
                 showNotification('📍 Harap pilih lokasi kejadian pada peta terlebih dahulu', 'error');
@@ -730,12 +634,9 @@ function setupVolumeSelector() {
 
 // ==================== RESET FORM TO STEP 1 ====================
 function resetFormToStep1() {
-    // Stop live GPS if active
     if (typeof stopLiveTracking === 'function') stopLiveTracking();
-    // Reset form
     if (form) form.reset();
     
-    // Reset photo preview
     const photoPreview = document.getElementById('photoPreview');
     if (photoPreview) {
         photoPreview.innerHTML = '';
@@ -744,7 +645,6 @@ function resetFormToStep1() {
     const placeholder = document.querySelector('.photo-placeholder');
     if (placeholder) placeholder.style.display = 'block';
     
-    // Reset lokasi
     selectedLat = null;
     selectedLng = null;
     currentLocationValid = false;
@@ -756,23 +656,19 @@ function resetFormToStep1() {
     const validasiGroup = document.getElementById('validasiLokasiGroup');
     if (validasiGroup) validasiGroup.style.display = 'none';
     
-    // Reset volume selector
     const volumeOptions = document.querySelectorAll('.volume-option');
     volumeOptions.forEach(opt => opt.classList.remove('active'));
     const volumeInput = document.getElementById('volume');
     if (volumeInput) volumeInput.value = '';
     
-    // Reset kategori select
     const kategoriSelect = document.getElementById('kategori');
     if (kategoriSelect) kategoriSelect.value = '';
     
-    // Reset nama dan kontak
     const namaInput = document.getElementById('nama');
     if (namaInput) namaInput.value = '';
     const kontakInput = document.getElementById('kontak');
     if (kontakInput) kontakInput.value = '';
     
-    // Reset deskripsi dan char counter
     if (deskripsiInput) {
         deskripsiInput.value = '';
         if (charCount) {
@@ -781,16 +677,13 @@ function resetFormToStep1() {
         }
     }
     
-    // Reset map marker ke posisi tengah
     const centerLat = (BATAS_WILAYAH.latMin + BATAS_WILAYAH.latMax) / 2;
     const centerLng = (BATAS_WILAYAH.lngMin + BATAS_WILAYAH.lngMax) / 2;
     if (marker) marker.setLatLng([centerLat, centerLng]);
     if (map) map.setView([centerLat, centerLng], 13);
     
-    // Reset ke step 1
     currentStep = 1;
     
-    // Update progress bar dan steps
     const steps = document.querySelectorAll('.step');
     const formSteps = document.querySelectorAll('.form-step');
     const progressFill = document.querySelector('.progress-fill');
@@ -814,7 +707,8 @@ function resetFormToStep1() {
         }
     });
     
-    // Scroll ke atas form
+    if (fotoInput) fotoInput.value = '';
+    
     const formCard = document.querySelector('.form-card');
     if (formCard) {
         formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -822,11 +716,6 @@ function resetFormToStep1() {
 }
 
 // ==================== SUBMIT LAPORAN ====================
-// Strategi pengiriman 2 tahap:
-//   Tahap 1 — data teks (url-encoded, terbukti bekerja, tanpa foto)
-//   Tahap 2 — foto saja (text/plain + JSON, hanya {action,timestamp,foto})
-// Alasan dipisah: url-encoded merusak karakter + dalam base64,
-// sedangkan body besar dalam satu request sering terpotong di Apps Script.
 async function submitLaporan(e) {
     e.preventDefault();
 
@@ -866,11 +755,10 @@ async function submitLaporan(e) {
     }
 
     try {
-        // ── TAHAP 1: kirim data teks tanpa foto (url-encoded) ──────────────
         const params = new URLSearchParams({
             action:    'submit',
             timestamp: timestamp,
-            foto:      '',        // kosong dulu, diisi tahap 2
+            foto:      '',
             lokasi:    lokasi,
             latitude:  String(selectedLat),
             longitude: String(selectedLng),
@@ -891,9 +779,6 @@ async function submitLaporan(e) {
             body:    params.toString()
         });
 
-        // ── TAHAP 2: kirim foto terpisah (text/plain + JSON) ───────────────
-        // text/plain adalah satu-satunya Content-Type yang diizinkan no-cors
-        // sekaligus tidak mengubah karakter apapun dalam string JSON/base64.
         if (submitBtn) {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah foto...';
         }
@@ -906,14 +791,50 @@ async function submitLaporan(e) {
             headers: { 'Content-Type': 'text/plain' },
             body:    JSON.stringify({
                 action:    'upload_foto',
-                timestamp: timestamp,   // kunci untuk mencocokkan baris di sheet
+                timestamp: timestamp,
                 foto:      fotoBase64
             })
         });
 
         showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
+        
+        // TAMBAHKAN LAPORAN BARU SECARA LOKAL AGAR LANGSUNG MUNCUL DI MAP
+        const newLaporan = {
+            timestamp: timestamp,
+            lokasi: lokasi,
+            latitude: String(selectedLat),
+            longitude: String(selectedLng),
+            kecamatan: currentKecamatan || '',
+            deskripsi: deskripsi,
+            nama: nama || 'Anonim',
+            kontak: kontak,
+            kategori: kategori,
+            volume: volume,
+            status: 'belum diproses',
+            foto: fotoBase64
+        };
+        
+        // Tambahkan ke awal array allLaporan
+        allLaporan.unshift(newLaporan);
+        
+        // Update stats dan render ulang
+        updateStats();
+        filterLaporan();
+        
+        // UPDATE MAP MARKERS dengan data terbaru
+        updateMapMarkers(allLaporan);
+        
+        const formCard = document.querySelector('.form-card');
+        if (formCard) {
+            formCard.classList.add('success-reset');
+            setTimeout(() => formCard.classList.remove('success-reset'), 500);
+        }
+        
         resetFormToStep1();
-        setTimeout(() => loadLaporan(), 2000);
+        
+        setTimeout(() => {
+            loadLaporan();
+        }, 3000);
 
     } catch (error) {
         console.error('Error:', error);
@@ -926,7 +847,6 @@ async function submitLaporan(e) {
     }
 }
 
-// Kompres foto ke max 1200px JPEG 80% sebelum dikirim
 function compressAndConvertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -937,7 +857,7 @@ function compressAndConvertToBase64(file) {
                 let w = img.width, h = img.height;
                 if (w > MAX || h > MAX) {
                     if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-                    else        { w = Math.round(w * MAX / h); h = MAX; }
+                    else { w = Math.round(w * MAX / h); h = MAX; }
                 }
                 const canvas = document.createElement('canvas');
                 canvas.width = w; canvas.height = h;
@@ -947,16 +867,6 @@ function compressAndConvertToBase64(file) {
             img.onerror = reject;
             img.src = ev.target.result;
         };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-// Fallback tanpa kompresi
-function convertToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
@@ -1061,13 +971,11 @@ function renderLaporan(laporan) {
         </div>
     `}).join('');
     
-    // Reinitialize AOS for new elements
     if (typeof AOS !== 'undefined') {
         AOS.refresh();
     }
 }
 
-// Image modal function
 window.openImageModal = function(imageSrc) {
     const modal = document.createElement('div');
     modal.style.cssText = `
@@ -1123,55 +1031,43 @@ function filterLaporan() {
 
 // ==================== PETA SEBARAN: IKON PER KATEGORI ====================
 const KATEGORI_ICON_MAP = {
-    'rumah-tangga' : { emoji: '🏠', color: '#f59e0b', fa: 'fa-house'         },
-    'plastik'      : { emoji: '🪣', color: '#3b82f6', fa: 'fa-bottle-water'  },
+    'rumah-tangga' : { emoji: '🏠', color: '#f59e0b', fa: 'fa-house' },
+    'plastik'      : { emoji: '🪣', color: '#3b82f6', fa: 'fa-bottle-water' },
     'bangunan'     : { emoji: '🏗️', color: '#8b5cf6', fa: 'fa-helmet-safety' },
-    'b3'           : { emoji: '⚠️', color: '#ef4444', fa: 'fa-biohazard'     },
-    'medis'        : { emoji: '🏥', color: '#ec4899', fa: 'fa-kit-medical'   },
-    'limbah-pabrik': { emoji: '🏭', color: '#64748b', fa: 'fa-industry'      },
-    'lainnya'      : { emoji: '📦', color: '#10b981', fa: 'fa-box'           },
+    'b3'           : { emoji: '⚠️', color: '#ef4444', fa: 'fa-biohazard' },
+    'medis'        : { emoji: '🏥', color: '#ec4899', fa: 'fa-kit-medical' },
+    'limbah-pabrik': { emoji: '🏭', color: '#64748b', fa: 'fa-industry' },
+    'lainnya'      : { emoji: '📦', color: '#10b981', fa: 'fa-box' },
 };
 
 function getKategoriMarkerIcon(kategori, status) {
-    const meta        = KATEGORI_ICON_MAP[kategori] || KATEGORI_ICON_MAP['lainnya'];
+    const meta = KATEGORI_ICON_MAP[kategori] || KATEGORI_ICON_MAP['lainnya'];
     const statusColor = getStatusColor(status);
-    // Outer ring uses status color; inner icon uses category color
     return L.divIcon({
         className: '',
         html: `
-            <div style="
-                position:relative;
-                width:38px; height:38px;
-                display:flex; align-items:center; justify-content:center;
-            ">
-                <div style="
-                    position:absolute; inset:0;
-                    border-radius:50%;
-                    background:${statusColor}22;
-                    border:2.5px solid ${statusColor};
-                    box-shadow:0 2px 8px ${statusColor}55;
-                "></div>
+            <div style="position:relative; width:38px; height:38px; display:flex; align-items:center; justify-content:center;">
+                <div style="position:absolute; inset:0; border-radius:50%; background:${statusColor}22; border:2.5px solid ${statusColor}; box-shadow:0 2px 8px ${statusColor}55;"></div>
                 <span style="font-size:18px; line-height:1; position:relative; z-index:1;">${meta.emoji}</span>
             </div>`,
-        iconSize    : [38, 38],
-        iconAnchor  : [19, 19],
-        popupAnchor : [0, -22],
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+        popupAnchor: [0, -22],
     });
 }
 
 // ==================== LOKASI USER DI PETA SEBARAN ====================
-let userLocationMarker  = null;
-let userLocationCircle  = null;
+let userLocationMarker = null;
+let userLocationCircle = null;
 let userLocationWatchId = null;
 
 function startUserLocationOnMap() {
     if (!navigator.geolocation || !map) return;
 
-    // Tambahkan tombol "Lokasi Saya" ke peta jika belum ada
     if (!document.getElementById('btnLokasiSayaPeta')) {
         const btn = document.createElement('button');
-        btn.id        = 'btnLokasiSayaPeta';
-        btn.title     = 'Tampilkan lokasi saya di peta';
+        btn.id = 'btnLokasiSayaPeta';
+        btn.title = 'Tampilkan lokasi saya di peta';
         btn.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
         btn.style.cssText = `
             position:absolute; bottom:90px; right:10px; z-index:800;
@@ -1183,22 +1079,20 @@ function startUserLocationOnMap() {
             transition:background .2s, color .2s;
         `;
         btn.onmouseenter = () => { btn.style.background='#10b981'; btn.style.color='#fff'; };
-        btn.onmouseleave = () => { btn.style.background='#fff';    btn.style.color='#10b981'; };
+        btn.onmouseleave = () => { btn.style.background='#fff'; btn.style.color='#10b981'; };
         btn.onclick = () => {
             if (userLocationMarker) {
-                map.flyTo(userLocationMarker.getLatLng(), 16, { duration:1.2 });
+                map.flyTo(userLocationMarker.getLatLng(), 16, { duration: 1.2 });
             } else {
                 showNotification('Mengaktifkan lokasi real-time…', 'sukses');
             }
         };
 
-        // Leaflet container
         const mapEl = document.getElementById('petaSebaran') || document.getElementById('map');
         if (mapEl) mapEl.style.position = 'relative';
         if (mapEl) mapEl.appendChild(btn);
     }
 
-    // Berhenti dulu kalau sudah berjalan
     if (userLocationWatchId !== null) {
         navigator.geolocation.clearWatch(userLocationWatchId);
     }
@@ -1214,26 +1108,15 @@ function startUserLocationOnMap() {
                 userLocationCircle.setLatLng([lat, lng]);
                 userLocationCircle.setRadius(acc);
             } else {
-                // Ikon titik biru pulsing
                 const pulseIcon = L.divIcon({
                     className: '',
                     html: `
                         <div style="position:relative;width:20px;height:20px;">
-                            <div style="
-                                position:absolute;inset:0;border-radius:50%;
-                                background:#3b82f633;border:2px solid #3b82f6;
-                                animation:userPulse 1.8s ease-out infinite;
-                            "></div>
-                            <div style="
-                                position:absolute;top:50%;left:50%;
-                                transform:translate(-50%,-50%);
-                                width:10px;height:10px;border-radius:50%;
-                                background:#3b82f6;border:2px solid #fff;
-                                box-shadow:0 0 6px #3b82f6aa;
-                            "></div>
+                            <div style="position:absolute;inset:0;border-radius:50%;background:#3b82f633;border:2px solid #3b82f6;animation:userPulse 1.8s ease-out infinite;"></div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 6px #3b82f6aa;"></div>
                         </div>`,
-                    iconSize   : [20, 20],
-                    iconAnchor : [10, 10],
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10],
                     popupAnchor: [0, -12],
                 });
 
@@ -1242,15 +1125,14 @@ function startUserLocationOnMap() {
                     .bindPopup('<b><i class="fas fa-location-dot" style="color:#3b82f6"></i> Lokasi Anda</b><br><small>Real-time GPS</small>');
 
                 userLocationCircle = L.circle([lat, lng], {
-                    radius     : acc,
-                    color      : '#3b82f6',
-                    fillColor  : '#3b82f6',
+                    radius: acc,
+                    color: '#3b82f6',
+                    fillColor: '#3b82f6',
                     fillOpacity: 0.07,
-                    weight     : 1,
-                    dashArray  : '4 4',
+                    weight: 1,
+                    dashArray: '4 4',
                 }).addTo(map);
 
-                // Inject animasi CSS sekali saja
                 if (!document.getElementById('userPulseStyle')) {
                     const style = document.createElement('style');
                     style.id = 'userPulseStyle';
@@ -1264,7 +1146,7 @@ function startUserLocationOnMap() {
                 }
             }
         },
-        () => { /* izin ditolak atau GPS tidak tersedia — diam saja */ },
+        () => {},
         { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
 }
@@ -1272,13 +1154,8 @@ function startUserLocationOnMap() {
 function updateMapMarkers(laporan) {
     if (!map) return;
     
-    // Hapus semua marker laporan (bukan marker form & bukan user location)
     map.eachLayer(layer => {
-        if (
-            layer instanceof L.Marker &&
-            layer !== marker &&
-            layer !== userLocationMarker
-        ) {
+        if (layer instanceof L.Marker && layer !== marker && layer !== userLocationMarker) {
             map.removeLayer(layer);
         }
         if (layer instanceof L.Circle && layer !== userLocationCircle) {
@@ -1286,17 +1163,14 @@ function updateMapMarkers(laporan) {
         }
     });
     
-    // Redraw polygons if needed
     if (wilayahPolygons.length === 0) {
         drawWilayahPolygons();
     }
     
     laporan.forEach(l => {
         if (!l.latitude || !l.longitude) return;
-        const lat         = parseFloat(l.latitude);
-        const lng         = parseFloat(l.longitude);
-        const statusColor = getStatusColor(l.status);
-        const meta        = KATEGORI_ICON_MAP[l.kategori] || KATEGORI_ICON_MAP['lainnya'];
+        const lat = parseFloat(l.latitude);
+        const lng = parseFloat(l.longitude);
         const statusLabel = l.status === 'belum diproses'
             ? `<span style="color:#f59e0b">⏳ Menunggu Verifikasi</span>`
             : l.status === 'proses'
@@ -1308,7 +1182,7 @@ function updateMapMarkers(laporan) {
             .bindPopup(`
                 <div style="min-width:230px;padding:4px;font-family:inherit;">
                     <div style="font-size:15px;font-weight:700;margin-bottom:6px;">
-                        ${meta.emoji} ${escapeHtml(getKategoriText(l.kategori))}
+                        ${getKategoriIcon(l.kategori)} ${escapeHtml(getKategoriText(l.kategori))}
                     </div>
                     <div style="margin-bottom:4px;">
                         <i class="fas fa-user" style="color:#10b981;width:14px;"></i>
@@ -1319,13 +1193,13 @@ function updateMapMarkers(laporan) {
                         ${escapeHtml(l.kecamatan)}
                     </div>` : ''}
                     <div style="margin-bottom:6px;color:#475569;font-size:12px;">
-                        ${escapeHtml((l.deskripsi || '').substring(0, 90))}${(l.deskripsi||'').length > 90 ? '…' : ''}
+                        ${escapeHtml((l.deskripsi || '').substring(0, 90))}${(l.deskripsi || '').length > 90 ? '…' : ''}
                     </div>
                     <div style="margin-bottom:6px;">${statusLabel}</div>
                     <hr style="margin:6px 0;border-color:#e2e8f0;">
                     <div style="font-size:11px;color:#94a3b8;">
                         <i class="far fa-calendar-alt"></i>
-                        ${l.timestamp ? new Date(l.timestamp).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
+                        ${l.timestamp ? new Date(l.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
                     </div>
                     <a href="#daftar" style="display:block;margin-top:8px;color:#10b981;text-decoration:none;font-weight:600;font-size:12px;">
                         <i class="fas fa-eye"></i> Lihat daftar laporan
@@ -1334,7 +1208,6 @@ function updateMapMarkers(laporan) {
             `);
     });
 
-    // Aktifkan lokasi real-time user di peta sebaran
     startUserLocationOnMap();
 }
 
@@ -1394,7 +1267,6 @@ function setupEventListeners() {
     if (scrollTopBtn) scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     if (navToggle) navToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
     
-    // Search clear button
     if (searchInput && searchClear) {
         searchInput.addEventListener('input', () => {
             if (searchClear) searchClear.style.display = searchInput.value ? 'flex' : 'none';
@@ -1406,14 +1278,12 @@ function setupEventListeners() {
         });
     }
     
-    // Close mobile menu when clicking a link
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks) navLinks.classList.remove('active');
         });
     });
     
-    // Active link on scroll
     window.addEventListener('scroll', () => {
         const sections = document.querySelectorAll('section');
         const scrollPos = window.scrollY + 100;
@@ -1434,7 +1304,6 @@ function setupEventListeners() {
         });
     });
     
-    // Handle window resize for cursor
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             if (typeof initCustomCursor === 'function') initCustomCursor();
