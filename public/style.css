@@ -873,6 +873,7 @@ body {
     align-items: center;
     gap: 10px;
     margin-top: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .location-status.valid {
@@ -885,6 +886,19 @@ body {
     background: #fef2f2;
     color: var(--danger);
     border: 1px solid var(--danger);
+}
+
+.location-status.loading {
+    background: rgba(59,130,246,0.08);
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+.location-status.gps-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .form-grid {
@@ -1085,6 +1099,7 @@ textarea {
 #map {
     height: 500px;
     width: 100%;
+    z-index: 1;
 }
 
 .map-footer {
@@ -1099,19 +1114,21 @@ textarea {
     gap: 8px;
 }
 
-/* ==================== KATEGORI MARKER STYLES ==================== */
+/* ==================== MARKER KATEGORI STYLES ==================== */
 .kategori-marker {
     transition: transform 0.2s ease, filter 0.2s ease;
+    z-index: 10;
 }
 
 .kategori-marker:hover {
-    transform: scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    transform: scale(1.15);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));
+    z-index: 1000;
 }
 
 @keyframes markerPopIn {
     0% { transform: scale(0); opacity: 0; }
-    60% { transform: scale(1.2); }
+    50% { transform: scale(1.2); }
     100% { transform: scale(1); opacity: 1; }
 }
 
@@ -1127,14 +1144,40 @@ textarea {
     transform: scale(1.15);
 }
 
+/* Custom popup styling */
 .leaflet-popup-content-wrapper {
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     padding: 0;
+    overflow: hidden;
 }
 
 .leaflet-popup-tip {
     background: white;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 260px;
+}
+
+/* Animasi fade untuk popup */
+@keyframes popupFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.leaflet-popup {
+    animation: popupFadeIn 0.2s ease;
+}
+
+/* Tombol lokasi saya di peta */
+#btnLokasiSayaPeta {
+    transition: all 0.3s ease;
+}
+
+#btnLokasiSayaPeta:hover {
+    transform: scale(1.05);
 }
 
 /* ==================== FILTER CARD ==================== */
@@ -1726,11 +1769,14 @@ textarea {
     background: transparent;
     border: none;
 }
+
 .gps-dot {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 28px; height: 28px;
+    width: 28px;
+    height: 28px;
     background: #2563eb;
     border: 3px solid #fff;
     border-radius: 50%;
@@ -1742,17 +1788,21 @@ textarea {
     box-shadow: 0 2px 8px rgba(37,99,235,0.5);
     z-index: 2;
 }
+
 .gps-pulse-ring {
     position: absolute;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 36px; height: 36px;
+    width: 36px;
+    height: 36px;
     border: 3px solid #2563eb;
     border-radius: 50%;
     opacity: 0;
     animation: gpsPulse 1.8s ease-out infinite;
     z-index: 1;
 }
+
 @keyframes gpsPulse {
     0%   { transform: translate(-50%,-50%) scale(0.5); opacity: 0.9; }
     100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
@@ -1761,21 +1811,10 @@ textarea {
 .accuracy-circle {
     animation: accuracyFadeIn 0.5s ease;
 }
+
 @keyframes accuracyFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
-}
-
-.location-status.gps-live {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.location-status.loading {
-    background: rgba(59,130,246,0.08);
-    border-color: #3b82f6;
-    color: #1d4ed8;
 }
 
 .btn-stop-gps {
@@ -1790,6 +1829,7 @@ textarea {
     transition: all 0.2s;
     white-space: nowrap;
 }
+
 .btn-stop-gps:hover {
     background: #ef4444;
     color: #fff;
@@ -1799,9 +1839,17 @@ textarea {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     animation: trackingGlow 2s ease-in-out infinite;
 }
+
 @keyframes trackingGlow {
     0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
     50%       { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+}
+
+/* ==================== USER LOCATION PULSE ==================== */
+@keyframes userPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    70% { transform: scale(2.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 0; }
 }
 
 /* ==================== RESPONSIVE ==================== */
@@ -1809,22 +1857,28 @@ textarea {
     .hero-title {
         font-size: 3rem;
     }
+    
     .section-title {
         font-size: 2rem;
     }
+    
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+    
     .filter-body {
         flex-direction: column;
     }
+    
     .filter-group {
         flex-direction: column;
     }
+    
     .filter-select {
         width: 100%;
     }
+    
     .info-section {
         padding: 2rem;
     }
@@ -1834,6 +1888,7 @@ textarea {
     .nav-toggle {
         display: flex;
     }
+    
     .nav-links {
         position: fixed;
         top: 80px;
@@ -1849,62 +1904,80 @@ textarea {
         z-index: 999;
         gap: 1rem;
     }
+    
     .nav-links.active {
         left: 0;
     }
+    
     .nav-link {
         width: 100%;
         justify-content: center;
     }
+    
     .hero-title {
         font-size: 2rem;
     }
+    
     .hero-stats {
         gap: 1rem;
     }
+    
     .stat-item {
         padding: 0.75rem 1rem;
     }
+    
     .stat-number {
         font-size: 1.25rem;
     }
+    
     .container {
         padding: 0 1rem;
     }
+    
     .section {
         margin-bottom: 3rem;
     }
+    
     .form-row {
         grid-template-columns: 1fr;
     }
+    
     .volume-selector {
         flex-direction: column;
     }
+    
     .laporan-header {
         flex-direction: column;
         text-align: center;
     }
+    
     .laporan-footer {
         flex-direction: column;
         text-align: center;
     }
+    
     .map-header {
         flex-direction: column;
         text-align: center;
     }
+    
     .progress-steps {
         display: none;
     }
+    
     .progress-bar {
         display: none;
     }
+    
     .form-navigation {
         flex-direction: column;
     }
+    
     .btn-next, .btn-prev {
         width: 100%;
         justify-content: center;
     }
+    
     #map {
         height: 400px;
     }
@@ -1914,24 +1987,30 @@ textarea {
     .hero-title {
         font-size: 1.5rem;
     }
+    
     .hero-badge {
         font-size: 0.7rem;
         padding: 0.5rem 1rem;
     }
+    
     .btn-primary, .btn-secondary {
         width: 100%;
         justify-content: center;
     }
+    
     .section-title {
         font-size: 1.5rem;
     }
+    
     .section-icon {
         width: 50px;
         height: 50px;
     }
+    
     .section-icon i {
         font-size: 1.3rem;
     }
+    
     #map {
         height: 350px;
     }
