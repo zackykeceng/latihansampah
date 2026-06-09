@@ -57,6 +57,7 @@ body {
     }
 }
 
+/* ==================== CUSTOM CURSOR ==================== */
 .cursor-dot {
     width: 6px;
     height: 6px;
@@ -91,6 +92,7 @@ body {
     }
 }
 
+/* ==================== LOADER ==================== */
 .loader {
     position: fixed;
     top: 0;
@@ -150,6 +152,7 @@ body {
     50% { transform: translate(-50%, -50%) scale(1.2); }
 }
 
+/* ==================== SCROLLBAR ==================== */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -167,6 +170,7 @@ body {
     background: var(--primary-dark);
 }
 
+/* ==================== SCROLL TOP ==================== */
 .scroll-top {
     position: fixed;
     bottom: 30px;
@@ -198,6 +202,7 @@ body {
     box-shadow: var(--shadow-xl);
 }
 
+/* ==================== NAVBAR ==================== */
 .navbar {
     position: fixed;
     top: 0;
@@ -320,6 +325,7 @@ body {
     color: white;
 }
 
+/* ==================== HERO SECTION ==================== */
 .hero {
     position: relative;
     min-height: 100vh;
@@ -337,11 +343,6 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0) translateX(0); }
-    50% { transform: translateY(-20px) translateX(10px); }
 }
 
 .hero-gradient-bg {
@@ -539,12 +540,14 @@ body {
     height: 60px;
 }
 
+/* ==================== CONTAINER ==================== */
 .container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
+/* ==================== SECTION ==================== */
 .section {
     margin-bottom: 6rem;
 }
@@ -625,6 +628,7 @@ body {
     margin: 0 auto;
 }
 
+/* ==================== FORM SECTION ==================== */
 .form-card {
     background: white;
     border-radius: var(--radius-2xl);
@@ -864,7 +868,6 @@ body {
     align-items: center;
     gap: 10px;
     margin-top: 0.75rem;
-    flex-wrap: wrap;
 }
 
 .location-status.valid {
@@ -877,19 +880,6 @@ body {
     background: #fef2f2;
     color: var(--danger);
     border: 1px solid var(--danger);
-}
-
-.location-status.loading {
-    background: rgba(59,130,246,0.08);
-    border-color: #3b82f6;
-    color: #1d4ed8;
-}
-
-.location-status.gps-live {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
 }
 
 .form-grid {
@@ -1026,6 +1016,7 @@ textarea {
     cursor: not-allowed;
 }
 
+/* ==================== MAP SECTION ==================== */
 .map-container {
     position: relative;
 }
@@ -1061,10 +1052,33 @@ textarea {
     font-size: 1.2rem;
 }
 
+.map-legend {
+    display: flex;
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-xs);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
 #map {
     height: 500px;
     width: 100%;
-    z-index: 1;
 }
 
 .map-footer {
@@ -1079,60 +1093,7 @@ textarea {
     gap: 8px;
 }
 
-.kategori-marker {
-    transition: transform 0.2s ease, filter 0.2s ease;
-    z-index: 10;
-}
-
-.kategori-marker:hover {
-    transform: scale(1.2);
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-    z-index: 1000;
-}
-
-@keyframes markerPopIn {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.kategori-marker {
-    animation: markerPopIn 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
-}
-
-.leaflet-popup-content-wrapper {
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    padding: 0;
-    overflow: hidden;
-}
-
-.leaflet-popup-tip {
-    background: white;
-}
-
-.leaflet-popup-content {
-    margin: 0;
-    min-width: 260px;
-}
-
-@keyframes popupFadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.leaflet-popup {
-    animation: popupFadeIn 0.2s ease;
-}
-
-#btnLokasiSayaPeta {
-    transition: all 0.3s ease;
-}
-
-#btnLokasiSayaPeta:hover {
-    transform: scale(1.05);
-}
-
+/* ==================== FILTER CARD ==================== */
 .filter-card {
     background: white;
     border-radius: var(--radius-xl);
@@ -1223,6 +1184,7 @@ textarea {
     background: white;
 }
 
+/* ==================== LAPORAN GRID ==================== */
 .laporan-grid {
     display: grid;
     gap: 1.5rem;
@@ -1384,6 +1346,7 @@ textarea {
     gap: 6px;
 }
 
+/* ==================== INFO SECTION ==================== */
 .info-section {
     background: linear-gradient(135deg, white 0%, var(--light) 100%);
     border-radius: var(--radius-2xl);
@@ -1514,6 +1477,7 @@ textarea {
     color: var(--primary);
 }
 
+/* ==================== FOOTER ==================== */
 .footer {
     background: var(--dark);
     color: white;
@@ -1645,6 +1609,7 @@ textarea {
     opacity: 0.7;
 }
 
+/* ==================== NOTIFICATION ==================== */
 .notifikasi {
     position: fixed;
     top: 100px;
@@ -1698,6 +1663,7 @@ textarea {
     }
 }
 
+/* ==================== MAP CUSTOM STYLES ==================== */
 .custom-div-icon {
     background: transparent;
     border: none;
@@ -1711,112 +1677,33 @@ textarea {
     fill-opacity: 0.15;
 }
 
-.live-gps-icon {
-    background: transparent;
-    border: none;
-}
-
-.gps-dot {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 28px;
-    height: 28px;
-    background: #2563eb;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 13px;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.5);
-    z-index: 2;
-}
-
-.gps-pulse-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 36px;
-    height: 36px;
-    border: 3px solid #2563eb;
-    border-radius: 50%;
-    opacity: 0;
-    animation: gpsPulse 1.8s ease-out infinite;
-    z-index: 1;
-}
-
-@keyframes gpsPulse {
-    0%   { transform: translate(-50%,-50%) scale(0.5); opacity: 0.9; }
-    100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
-}
-
-.accuracy-circle {
-    animation: accuracyFadeIn 0.5s ease;
-}
-
-@keyframes accuracyFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-.btn-stop-gps {
-    margin-left: auto;
-    background: rgba(239,68,68,0.1);
-    border: 1px solid #ef4444;
-    color: #dc2626;
-    border-radius: 6px;
-    padding: 3px 9px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.btn-stop-gps:hover {
-    background: #ef4444;
-    color: #fff;
-}
-
-.btn-location.btn-tracking {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    animation: trackingGlow 2s ease-in-out infinite;
-}
-
-@keyframes trackingGlow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
-    50%       { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
-}
-
-@keyframes userPulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    70% { transform: scale(2.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 0; }
-}
-
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 968px) {
     .hero-title {
         font-size: 3rem;
     }
+    
     .section-title {
         font-size: 2rem;
     }
+    
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+    
     .filter-body {
         flex-direction: column;
     }
+    
     .filter-group {
         flex-direction: column;
     }
+    
     .filter-select {
         width: 100%;
     }
+    
     .info-section {
         padding: 2rem;
     }
@@ -1826,6 +1713,7 @@ textarea {
     .nav-toggle {
         display: flex;
     }
+    
     .nav-links {
         position: fixed;
         top: 80px;
@@ -1841,62 +1729,80 @@ textarea {
         z-index: 999;
         gap: 1rem;
     }
+    
     .nav-links.active {
         left: 0;
     }
+    
     .nav-link {
         width: 100%;
         justify-content: center;
     }
+    
     .hero-title {
         font-size: 2rem;
     }
+    
     .hero-stats {
         gap: 1rem;
     }
+    
     .stat-item {
         padding: 0.75rem 1rem;
     }
+    
     .stat-number {
         font-size: 1.25rem;
     }
+    
     .container {
         padding: 0 1rem;
     }
+    
     .section {
         margin-bottom: 3rem;
     }
+    
     .form-row {
         grid-template-columns: 1fr;
     }
+    
     .volume-selector {
         flex-direction: column;
     }
+    
     .laporan-header {
         flex-direction: column;
         text-align: center;
     }
+    
     .laporan-footer {
         flex-direction: column;
         text-align: center;
     }
+    
     .map-header {
         flex-direction: column;
         text-align: center;
     }
+    
     .progress-steps {
         display: none;
     }
+    
     .progress-bar {
         display: none;
     }
+    
     .form-navigation {
         flex-direction: column;
     }
+    
     .btn-next, .btn-prev {
         width: 100%;
         justify-content: center;
     }
+
     #map {
         height: 400px;
     }
@@ -1906,29 +1812,36 @@ textarea {
     .hero-title {
         font-size: 1.5rem;
     }
+    
     .hero-badge {
         font-size: 0.7rem;
         padding: 0.5rem 1rem;
     }
+    
     .btn-primary, .btn-secondary {
         width: 100%;
         justify-content: center;
     }
+    
     .section-title {
         font-size: 1.5rem;
     }
+    
     .section-icon {
         width: 50px;
         height: 50px;
     }
+    
     .section-icon i {
         font-size: 1.3rem;
     }
+
     #map {
         height: 350px;
     }
 }
 
+/* ==================== ERROR HIGHLIGHT EFFECTS ==================== */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -1954,4 +1867,92 @@ textarea {
 .form-card.success-reset {
     animation: successPulse 0.5s ease;
     border: 2px solid #10b981;
+}
+/* ==================== LIVE GPS TRACKING UI ==================== */
+
+/* Pulsing GPS dot icon on map */
+.live-gps-icon {
+    background: transparent;
+    border: none;
+}
+.gps-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px; height: 28px;
+    background: #2563eb;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 13px;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.5);
+    z-index: 2;
+}
+.gps-pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px; height: 36px;
+    border: 3px solid #2563eb;
+    border-radius: 50%;
+    opacity: 0;
+    animation: gpsPulse 1.8s ease-out infinite;
+    z-index: 1;
+}
+@keyframes gpsPulse {
+    0%   { transform: translate(-50%,-50%) scale(0.5); opacity: 0.9; }
+    100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+}
+
+/* Accuracy radius circle style (set via Leaflet options, class for extra tweaks) */
+.accuracy-circle {
+    animation: accuracyFadeIn 0.5s ease;
+}
+@keyframes accuracyFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Location status — live state */
+.location-status.gps-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.location-status.loading {
+    background: rgba(59,130,246,0.08);
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+/* Stop GPS button inside status bar */
+.btn-stop-gps {
+    margin-left: auto;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid #ef4444;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-stop-gps:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Tracking state on the main button */
+.btn-location.btn-tracking {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    animation: trackingGlow 2s ease-in-out infinite;
+}
+@keyframes trackingGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
 }
