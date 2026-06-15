@@ -1,7 +1,7 @@
-// Konfigurasi Google Sheets 
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxaHFVsqUUFn4S85Z4islqTnMGIc1Lm9g_cT_qC_HjoDQUGIvZoNv4Tfu8KsQIZqLM/exec';
+// Konfigurasi - GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA
+const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
-// ==================== POLIGON WILAYAH KECAMATAN ====================
+// ==================== POLIGON WILAYAH ====================
 const WILAYAH = {
     ngambon: {
         name: 'Kecamatan Ngambon',
@@ -46,9 +46,12 @@ const WILAYAH = {
 
 const BATAS_WILAYAH = { latMin: -7.3090, latMax: -7.2100, lngMin: 111.5790, lngMax: 111.7520 };
 
-let map, marker, selectedLat = null, selectedLng = null, currentLocationValid = false, currentKecamatan = null, allLaporan = [], wilayahPolygons = [], currentStep = 1, autoRefreshInterval = null;
-let liveWatchId = null, liveCircle = null, liveMarkerEl = null;
+// ==================== GLOBAL VARIABLES ====================
+let map, marker, selectedLat = null, selectedLng = null, currentLocationValid = false, currentKecamatan = null;
+let allLaporan = [], wilayahPolygons = [], currentStep = 1, autoRefreshInterval = null;
+let liveWatchId = null, liveCircle = null, liveMarkerEl = null, userLocationMarker = null, userLocationCircle = null, userLocationWatchId = null;
 
+// DOM Elements
 const scrollTopBtn = document.getElementById('scrollTopBtn');
 const navbar = document.getElementById('navbar');
 const navToggle = document.getElementById('navToggle');
@@ -64,10 +67,11 @@ const filterKecamatan = document.getElementById('filterKecamatan');
 const filterKategori = document.getElementById('filterKategori');
 const searchClear = document.getElementById('searchClear');
 
+// ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { const loader = document.getElementById('loader'); if (loader) loader.classList.add('hide'); }, 1000);
-    if (typeof AOS !== 'undefined') { AOS.init({ duration: 1000, once: true, offset: 100, easing: 'ease-out-cubic' }); }
-    if (window.innerWidth > 768) { initCustomCursor(); }
+    if (typeof AOS !== 'undefined') AOS.init({ duration: 1000, once: true, offset: 100 });
+    if (window.innerWidth > 768) initCustomCursor();
     initParticles();
     initMap();
     await loadLaporan();
@@ -76,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupFormSteps();
     setupVolumeSelector();
     if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-    autoRefreshInterval = setInterval(() => { loadLaporan(); }, 30000);
+    autoRefreshInterval = setInterval(() => loadLaporan(), 30000);
 });
 
 function initCustomCursor() {
@@ -94,14 +98,14 @@ function initCustomCursor() {
 }
 
 function initParticles() {
-    const particlesContainer = document.getElementById('heroParticles');
-    if (!particlesContainer) return;
-    particlesContainer.innerHTML = '';
+    const container = document.getElementById('heroParticles');
+    if (!container) return;
+    container.innerHTML = '';
     for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.cssText = `position:absolute; width:${Math.random() * 4 + 2}px; height:${Math.random() * 4 + 2}px; background:rgba(16,185,129,${Math.random() * 0.3 + 0.1}); border-radius:50%; left:${Math.random() * 100}%; top:${Math.random() * 100}%; animation:float ${Math.random() * 10 + 5}s ease-in-out infinite; animation-delay:${Math.random() * 5}s; pointer-events:none;`;
-        particlesContainer.appendChild(particle);
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.cssText = `position:absolute; width:${Math.random() * 4 + 2}px; height:${Math.random() * 4 + 2}px; background:rgba(16,185,129,${Math.random() * 0.3 + 0.1}); border-radius:50%; left:${Math.random() * 100}%; top:${Math.random() * 100}%; animation:float ${Math.random() * 10 + 5}s ease-in-out infinite; animation-delay:${Math.random() * 5}s; pointer-events:none;`;
+        container.appendChild(p);
     }
 }
 
@@ -109,29 +113,34 @@ function initMap() {
     const centerLat = (BATAS_WILAYAH.latMin + BATAS_WILAYAH.latMax) / 2;
     const centerLng = (BATAS_WILAYAH.lngMin + BATAS_WILAYAH.lngMax) / 2;
     map = L.map('map').setView([centerLat, centerLng], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> & CartoDB | DLH Bojonegoro', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OSM & CartoDB | DLH Bojonegoro',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
     drawWilayahPolygons();
-    const customIcon = L.divIcon({ className: 'custom-div-icon', html: '<i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 40px; text-shadow: 0 0 3px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>', iconSize: [40, 40], popupAnchor: [0, -20] });
+    const customIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: '<i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 40px; text-shadow: 0 0 3px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>',
+        iconSize: [40, 40],
+        popupAnchor: [0, -20]
+    });
     marker = L.marker([centerLat, centerLng], { draggable: true, icon: customIcon }).addTo(map);
-    marker.on('dragend', function(e) { updateSelectedLocation(e.target.getLatLng().lat, e.target.getLatLng().lng); });
-    map.on('click', function(e) { updateSelectedLocation(e.latlng.lat, e.latlng.lng); });
+    marker.on('dragend', (e) => updateSelectedLocation(e.target.getLatLng().lat, e.target.getLatLng().lng));
+    map.on('click', (e) => updateSelectedLocation(e.latlng.lat, e.latlng.lng));
 }
 
 function drawWilayahPolygons() {
-    const polygonStyle = { color: '#10b981', weight: 3, opacity: 0.9, fillColor: '#10b981', fillOpacity: 0.15, smoothFactor: 1, className: 'area-polygon' };
-    WILAYAH.ngambon.polygons.forEach(polygonCoords => {
-        const polygon = L.polygon(polygonCoords, polygonStyle).addTo(map);
-        polygon.bindPopup(`<div style="text-align:center;padding:8px;"><strong style="color:#10b981;">🏘️ ${WILAYAH.ngambon.name}</strong><br><span style="font-size:12px;">Desa: ${WILAYAH.ngambon.villages.join(', ')}</span><br><span style="color:#10b981;font-size:11px;">✓ Wilayah layanan DLH</span></div>`);
-        polygon.on('mouseover', function() { polygon.setStyle({ fillOpacity: 0.3 }); });
-        polygon.on('mouseout', function() { polygon.setStyle({ fillOpacity: 0.15 }); });
-        wilayahPolygons.push(polygon);
+    const style = { color: '#10b981', weight: 3, opacity: 0.9, fillColor: '#10b981', fillOpacity: 0.15 };
+    WILAYAH.ngambon.polygons.forEach(coords => {
+        const p = L.polygon(coords, style).addTo(map);
+        p.bindPopup(`<strong>🏘️ Kecamatan Ngambon</strong><br>Desa: ${WILAYAH.ngambon.villages.join(', ')}`);
+        wilayahPolygons.push(p);
     });
-    WILAYAH.tambakrejo.polygons.forEach(polygonCoords => {
-        const polygon = L.polygon(polygonCoords, polygonStyle).addTo(map);
-        polygon.bindPopup(`<div style="text-align:center;padding:8px;"><strong style="color:#10b981;">🏘️ ${WILAYAH.tambakrejo.name}</strong><br><span style="font-size:12px;">Desa: ${WILAYAH.tambakrejo.villages.join(', ')}</span><br><span style="color:#10b981;font-size:11px;">✓ Wilayah layanan DLH</span></div>`);
-        polygon.on('mouseover', function() { polygon.setStyle({ fillOpacity: 0.3 }); });
-        polygon.on('mouseout', function() { polygon.setStyle({ fillOpacity: 0.15 }); });
-        wilayahPolygons.push(polygon);
+    WILAYAH.tambakrejo.polygons.forEach(coords => {
+        const p = L.polygon(coords, style).addTo(map);
+        p.bindPopup(`<strong>🏘️ Kecamatan Tambakrejo</strong><br>Desa: ${WILAYAH.tambakrejo.villages.join(', ')}`);
+        wilayahPolygons.push(p);
     });
 }
 
@@ -147,14 +156,18 @@ function isPointInPolygon(lat, lng, polygon) {
 }
 
 function validateLocation(lat, lng) {
-    if (lat < BATAS_WILAYAH.latMin || lat > BATAS_WILAYAH.latMax || lng < BATAS_WILAYAH.lngMin || lng > BATAS_WILAYAH.lngMax) return { valid: false, kecamatan: null };
-    for (const polygon of WILAYAH.ngambon.polygons) if (isPointInPolygon(lat, lng, polygon)) return { valid: true, kecamatan: 'Kecamatan Ngambon' };
-    for (const polygon of WILAYAH.tambakrejo.polygons) if (isPointInPolygon(lat, lng, polygon)) return { valid: true, kecamatan: 'Kecamatan Tambakrejo' };
+    if (lat < BATAS_WILAYAH.latMin || lat > BATAS_WILAYAH.latMax || lng < BATAS_WILAYAH.lngMin || lng > BATAS_WILAYAH.lngMax)
+        return { valid: false, kecamatan: null };
+    for (const poly of WILAYAH.ngambon.polygons)
+        if (isPointInPolygon(lat, lng, poly)) return { valid: true, kecamatan: 'Kecamatan Ngambon' };
+    for (const poly of WILAYAH.tambakrejo.polygons)
+        if (isPointInPolygon(lat, lng, poly)) return { valid: true, kecamatan: 'Kecamatan Tambakrejo' };
     return { valid: false, kecamatan: null };
 }
 
 function updateSelectedLocation(lat, lng) {
-    selectedLat = lat; selectedLng = lng;
+    selectedLat = lat;
+    selectedLng = lng;
     marker.setLatLng([lat, lng]);
     const validasi = validateLocation(lat, lng);
     currentLocationValid = validasi.valid;
@@ -167,13 +180,18 @@ function updateSelectedLocation(lat, lng) {
         validasiGroup.style.display = 'block';
         if (validasi.valid) {
             locationStatus.className = 'location-status valid';
-            locationStatus.innerHTML = `<i class="fas fa-check-circle"></i> ✅ Lokasi valid di ${validasi.kecamatan} - Dalam wilayah layanan DLH Bojonegoro`;
-            let hiddenKecamatan = document.getElementById('kecamatanOtomatis');
-            if (!hiddenKecamatan) { hiddenKecamatan = document.createElement('input'); hiddenKecamatan.type = 'hidden'; hiddenKecamatan.id = 'kecamatanOtomatis'; document.getElementById('formLaporan').appendChild(hiddenKecamatan); }
-            hiddenKecamatan.value = validasi.kecamatan;
+            locationStatus.innerHTML = `<i class="fas fa-check-circle"></i> ✅ Lokasi valid di ${validasi.kecamatan}`;
+            let hidden = document.getElementById('kecamatanOtomatis');
+            if (!hidden) {
+                hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.id = 'kecamatanOtomatis';
+                document.getElementById('formLaporan').appendChild(hidden);
+            }
+            hidden.value = validasi.kecamatan;
         } else {
             locationStatus.className = 'location-status invalid';
-            locationStatus.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Lokasi di luar wilayah layanan DLH! Hanya Kecamatan Ngambon & Tambakrejo yang dilayani.`;
+            locationStatus.innerHTML = `<i class="fas fa-times-circle"></i> ❌ Lokasi di luar wilayah layanan DLH!`;
         }
     }
 }
@@ -181,41 +199,29 @@ function updateSelectedLocation(lat, lng) {
 function startLiveTracking() {
     if (!navigator.geolocation) { showNotification('Browser tidak mendukung geolokasi', 'error'); return; }
     const btn = document.getElementById('getLocationBtn');
-    if (btn) { btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mencari Sinyal GPS…'; btn.disabled = true; btn.classList.add('btn-tracking'); }
-    if (liveWatchId !== null) { navigator.geolocation.clearWatch(liveWatchId); liveWatchId = null; }
-    const validasiGroup = document.getElementById('validasiLokasiGroup');
+    if (btn) { btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Mencari GPS...'; btn.disabled = true; }
+    if (liveWatchId !== null) navigator.geolocation.clearWatch(liveWatchId);
     const locationStatus = document.getElementById('locationStatus');
-    if (validasiGroup) validasiGroup.style.display = 'block';
-    if (locationStatus) { locationStatus.className = 'location-status loading'; locationStatus.innerHTML = '<i class="fas fa-satellite-dish fa-pulse"></i> <span id="gpsStatusText">Menghubungi satelit GPS… pastikan Anda berada di luar ruangan.</span>'; }
+    if (locationStatus) locationStatus.innerHTML = '<i class="fas fa-satellite-dish fa-pulse"></i> Menghubungi satelit GPS...';
     let firstFix = true;
     liveWatchId = navigator.geolocation.watchPosition(
         (pos) => {
-            const lat = pos.coords.latitude, lng = pos.coords.longitude, accuracy = pos.coords.accuracy;
+            const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy;
             updateSelectedLocation(lat, lng);
-            if (firstFix) { map.flyTo([lat, lng], 16, { duration: 1.5 }); firstFix = false; } else { map.setView([lat, lng], map.getZoom()); }
-            if (liveCircle) { liveCircle.setLatLng([lat, lng]); liveCircle.setRadius(accuracy); } else { liveCircle = L.circle([lat, lng], { radius: accuracy, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.08, weight: 2, dashArray: '6 4', className: 'accuracy-circle' }).addTo(map); }
-            if (!liveMarkerEl) { const liveIcon = L.divIcon({ className: 'live-gps-icon', html: `<div class="gps-pulse-ring"></div><div class="gps-dot"><i class="fas fa-location-crosshairs"></i></div>`, iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -18] }); if (marker) marker.setIcon(liveIcon); liveMarkerEl = true; }
-            const qualityLabel = accuracy <= 10 ? '🟢 Presisi Tinggi' : accuracy <= 30 ? '🟡 Presisi Baik' : accuracy <= 80 ? '🟠 Presisi Sedang' : '🔴 Presisi Rendah';
-            if (locationStatus && currentLocationValid) {
-                locationStatus.className = 'location-status valid gps-live';
-                locationStatus.innerHTML = `<i class="fas fa-satellite-dish"></i> <span id="gpsStatusText">📡 <b>LIVE</b> · ${currentKecamatan} · Akurasi ±${Math.round(accuracy)} m &nbsp;${qualityLabel}</span> <button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking"><i class="fas fa-stop-circle"></i></button>`;
-            } else if (locationStatus) {
-                locationStatus.className = 'location-status invalid gps-live';
-                locationStatus.innerHTML = `<i class="fas fa-triangle-exclamation"></i> <span id="gpsStatusText">❌ Di luar wilayah layanan · Akurasi ±${Math.round(accuracy)} m</span> <button class="btn-stop-gps" onclick="stopLiveTracking()" title="Hentikan tracking"><i class="fas fa-stop-circle"></i></button>`;
+            if (firstFix) { map.flyTo([lat, lng], 16, { duration: 1.5 }); firstFix = false; }
+            else map.setView([lat, lng], map.getZoom());
+            if (liveCircle) { liveCircle.setLatLng([lat, lng]); liveCircle.setRadius(acc); }
+            else liveCircle = L.circle([lat, lng], { radius: acc, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.08, weight: 2, dashArray: '6 4' }).addTo(map);
+            if (!liveMarkerEl) {
+                const liveIcon = L.divIcon({ className: 'live-gps-icon', html: `<div class="gps-pulse-ring"></div><div class="gps-dot"><i class="fas fa-location-crosshairs"></i></div>`, iconSize: [36, 36], iconAnchor: [18, 18] });
+                if (marker) marker.setIcon(liveIcon);
+                liveMarkerEl = true;
             }
             if (btn) { btn.innerHTML = '<i class="fas fa-stop-circle"></i> Hentikan Tracking'; btn.disabled = false; btn.onclick = stopLiveTracking; }
         },
         (error) => {
             stopLiveTracking();
-            let pesan = 'Gagal mendapatkan lokasi: ';
-            switch (error.code) {
-                case error.PERMISSION_DENIED: pesan += 'Izin lokasi ditolak. Aktifkan di pengaturan browser.'; break;
-                case error.POSITION_UNAVAILABLE: pesan += 'Sinyal GPS tidak tersedia. Pindah ke lokasi terbuka.'; break;
-                case error.TIMEOUT: pesan += 'Waktu habis. Coba lagi.'; break;
-                default: pesan += 'Terjadi kesalahan.';
-            }
-            showNotification(pesan, 'error');
-            if (locationStatus) { locationStatus.className = 'location-status invalid'; locationStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${pesan}`; }
+            showNotification('Gagal mendapatkan lokasi', 'error');
         },
         { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
     );
@@ -225,11 +231,15 @@ function stopLiveTracking() {
     if (liveWatchId !== null) { navigator.geolocation.clearWatch(liveWatchId); liveWatchId = null; }
     if (liveCircle) { map.removeLayer(liveCircle); liveCircle = null; }
     liveMarkerEl = null;
-    const defaultIcon = L.divIcon({ className: 'custom-div-icon', html: '<i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 40px; text-shadow: 0 0 3px white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>', iconSize: [40, 40], popupAnchor: [0, -20] });
+    const defaultIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: '<i class="fas fa-map-marker-alt" style="color: #10b981; font-size: 40px;"></i>',
+        iconSize: [40, 40],
+        popupAnchor: [0, -20]
+    });
     if (marker) marker.setIcon(defaultIcon);
     const btn = document.getElementById('getLocationBtn');
-    if (btn) { btn.innerHTML = '<i class="fas fa-location-dot"></i> Gunakan Lokasi Saya'; btn.disabled = false; btn.classList.remove('btn-tracking'); btn.onclick = startLiveTracking; }
-    showNotification('Tracking GPS dihentikan. Lokasi terakhir tersimpan.', 'sukses');
+    if (btn) { btn.innerHTML = '<i class="fas fa-location-dot"></i> Gunakan Lokasi Saya'; btn.disabled = false; btn.onclick = startLiveTracking; }
 }
 
 function getCurrentLocation() { startLiveTracking(); }
@@ -239,32 +249,60 @@ function setupFormSteps() {
     const formSteps = document.querySelectorAll('.form-step');
     const progressFill = document.querySelector('.progress-fill');
     function updateProgress(step) {
-        const totalSteps = formSteps.length;
-        const progress = (step / totalSteps) * 100;
-        if (progressFill) progressFill.style.width = `${progress}%`;
-        steps.forEach((s, i) => { if (i + 1 < step) { s.classList.add('completed'); s.classList.remove('active'); } else if (i + 1 === step) { s.classList.add('active'); s.classList.remove('completed'); } else { s.classList.remove('active', 'completed'); } });
+        const total = formSteps.length;
+        if (progressFill) progressFill.style.width = `${(step / total) * 100}%`;
+        steps.forEach((s, i) => {
+            if (i + 1 < step) { s.classList.add('completed'); s.classList.remove('active'); }
+            else if (i + 1 === step) { s.classList.add('active'); s.classList.remove('completed'); }
+            else { s.classList.remove('active', 'completed'); }
+        });
         formSteps.forEach((fs, i) => { if (i + 1 === step) fs.classList.add('active'); else fs.classList.remove('active'); });
     }
-    document.querySelectorAll('.btn-next').forEach(btn => { btn.addEventListener('click', () => { const nextStep = parseInt(btn.dataset.next); if (validateStep(currentStep)) { if (currentStep === 2 && typeof stopLiveTracking === 'function') stopLiveTracking(); currentStep = nextStep; updateProgress(currentStep); const formCard = document.querySelector('.form-card'); if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
-    document.querySelectorAll('.btn-prev').forEach(btn => { btn.addEventListener('click', () => { const prevStep = parseInt(btn.dataset.prev); if (currentStep === 2 && typeof stopLiveTracking === 'function') stopLiveTracking(); currentStep = prevStep; updateProgress(currentStep); const formCard = document.querySelector('.form-card'); if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); });
+    document.querySelectorAll('.btn-next').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const next = parseInt(btn.dataset.next);
+            if (validateStep(currentStep)) {
+                if (currentStep === 2 && typeof stopLiveTracking === 'function') stopLiveTracking();
+                currentStep = next;
+                updateProgress(currentStep);
+                document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+    document.querySelectorAll('.btn-prev').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const prev = parseInt(btn.dataset.prev);
+            if (currentStep === 2 && typeof stopLiveTracking === 'function') stopLiveTracking();
+            currentStep = prev;
+            updateProgress(currentStep);
+            document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
     function validateStep(step) {
-        if (step === 1) { if (!fotoInput || !fotoInput.files || !fotoInput.files[0]) { showNotification('📸 Harap unggah foto dokumentasi sampah terlebih dahulu', 'error'); return false; } return true; }
-        if (step === 2) { if (!selectedLat || !selectedLng) { showNotification('📍 Harap pilih lokasi kejadian pada peta terlebih dahulu', 'error'); return false; } if (!currentLocationValid) { showNotification('❌ Lokasi di luar wilayah layanan DLH! Hanya Kecamatan Ngambon & Tambakrejo yang dilayani.', 'error'); return false; } return true; }
+        if (step === 1 && (!fotoInput?.files?.[0])) { showNotification('📸 Harap unggah foto dokumentasi', 'error'); return false; }
+        if (step === 2 && (!selectedLat || !selectedLng)) { showNotification('📍 Harap pilih lokasi di peta', 'error'); return false; }
+        if (step === 2 && !currentLocationValid) { showNotification('❌ Lokasi di luar wilayah layanan DLH!', 'error'); return false; }
         return true;
     }
 }
 
 function setupVolumeSelector() {
-    const volumeOptions = document.querySelectorAll('.volume-option');
+    const options = document.querySelectorAll('.volume-option');
     const volumeInput = document.getElementById('volume');
-    volumeOptions.forEach(option => { option.addEventListener('click', () => { volumeOptions.forEach(opt => opt.classList.remove('active')); option.classList.add('active'); if (volumeInput) volumeInput.value = option.dataset.volume; }); });
+    options.forEach(opt => {
+        opt.addEventListener('click', () => {
+            options.forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            if (volumeInput) volumeInput.value = opt.dataset.volume;
+        });
+    });
 }
 
 function resetFormToStep1() {
     if (typeof stopLiveTracking === 'function') stopLiveTracking();
     if (form) form.reset();
-    const photoPreview = document.getElementById('photoPreview');
-    if (photoPreview) { photoPreview.innerHTML = ''; photoPreview.style.display = 'none'; }
+    const preview = document.getElementById('photoPreview');
+    if (preview) { preview.innerHTML = ''; preview.style.display = 'none'; }
     const placeholder = document.querySelector('.photo-placeholder');
     if (placeholder) placeholder.style.display = 'block';
     selectedLat = null; selectedLng = null; currentLocationValid = false; currentKecamatan = null;
@@ -275,12 +313,9 @@ function resetFormToStep1() {
     document.querySelectorAll('.volume-option').forEach(opt => opt.classList.remove('active'));
     const volumeInput = document.getElementById('volume');
     if (volumeInput) volumeInput.value = '';
-    const kategoriSelect = document.getElementById('kategori');
-    if (kategoriSelect) kategoriSelect.value = '';
-    const namaInput = document.getElementById('nama');
-    if (namaInput) namaInput.value = '';
-    const kontakInput = document.getElementById('kontak');
-    if (kontakInput) kontakInput.value = '';
+    document.getElementById('kategori') ? document.getElementById('kategori').value = '' : null;
+    document.getElementById('nama') ? document.getElementById('nama').value = '' : null;
+    document.getElementById('kontak') ? document.getElementById('kontak').value = '' : null;
     if (deskripsiInput) { deskripsiInput.value = ''; if (charCount) { charCount.textContent = '0'; charCount.style.color = '#64748b'; } }
     const centerLat = (BATAS_WILAYAH.latMin + BATAS_WILAYAH.latMax) / 2;
     const centerLng = (BATAS_WILAYAH.lngMin + BATAS_WILAYAH.lngMax) / 2;
@@ -291,21 +326,23 @@ function resetFormToStep1() {
     const formSteps = document.querySelectorAll('.form-step');
     const progressFill = document.querySelector('.progress-fill');
     if (progressFill) progressFill.style.width = '25%';
-    steps.forEach((step, index) => { if (index === 0) { step.classList.add('active'); step.classList.remove('completed'); } else { step.classList.remove('active', 'completed'); } });
-    formSteps.forEach((fs, index) => { if (index === 0) fs.classList.add('active'); else fs.classList.remove('active'); });
-    const formCard = document.querySelector('.form-card');
-    if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    steps.forEach((s, i) => { if (i === 0) { s.classList.add('active'); s.classList.remove('completed'); } else { s.classList.remove('active', 'completed'); } });
+    formSteps.forEach((fs, i) => { if (i === 0) fs.classList.add('active'); else fs.classList.remove('active'); });
+    document.querySelector('.form-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function compressAndConvertToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = function(ev) {
+        reader.onload = (ev) => {
             const img = new Image();
-            img.onload = function() {
+            img.onload = () => {
                 const MAX = 1200;
                 let w = img.width, h = img.height;
-                if (w > MAX || h > MAX) { if (w > h) { h = Math.round(h * MAX / w); w = MAX; } else { w = Math.round(w * MAX / h); h = MAX; } }
+                if (w > MAX || h > MAX) {
+                    if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                    else { w = Math.round(w * MAX / h); h = MAX; }
+                }
                 const canvas = document.createElement('canvas');
                 canvas.width = w; canvas.height = h;
                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
@@ -321,146 +358,302 @@ function compressAndConvertToBase64(file) {
 
 async function submitLaporan(e) {
     e.preventDefault();
-    const foto = fotoInput ? fotoInput.files[0] : null;
-    if (!foto) { showNotification('Harap unggah foto dokumentasi sampah', 'error'); return; }
-    if (!selectedLat || !selectedLng) { showNotification('Harap pilih lokasi kejadian terlebih dahulu', 'error'); return; }
+    const foto = fotoInput?.files?.[0];
+    if (!foto) { showNotification('Harap unggah foto dokumentasi', 'error'); return; }
+    if (!selectedLat || !selectedLng) { showNotification('Harap pilih lokasi kejadian', 'error'); return; }
     if (!currentLocationValid) { showNotification('❌ Lokasi di luar wilayah layanan DLH!', 'error'); return; }
-    const deskripsi = deskripsiInput ? deskripsiInput.value : '';
-    if (!deskripsi) { showNotification('Harap isi deskripsi sampah', 'error'); return; }
-    if (deskripsi.length > 500) { showNotification('Deskripsi maksimal 500 karakter', 'error'); return; }
+    if (!deskripsiInput?.value) { showNotification('Harap isi deskripsi sampah', 'error'); return; }
+    if (deskripsiInput.value.length > 500) { showNotification('Deskripsi maksimal 500 karakter', 'error'); return; }
+
     const volume = document.getElementById('volume')?.value || 'tidak diketahui';
     const kategori = document.getElementById('kategori')?.value || 'lainnya';
     const nama = document.getElementById('nama')?.value || 'Anonim';
     const kontak = document.getElementById('kontak')?.value || '-';
     const lokasi = document.getElementById('lokasi')?.value || '';
     const timestamp = new Date().toISOString();
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim ke DLH...'; }
+
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...'; }
+
     try {
-        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengompres foto...';
         const fotoBase64 = await compressAndConvertToBase64(foto);
-        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan data laporan...';
-        const params = new URLSearchParams({
-            action: 'submit',
-            timestamp: timestamp,
-            foto: fotoBase64,
-            lokasi: lokasi,
-            latitude: String(selectedLat),
-            longitude: String(selectedLng),
-            kecamatan: currentKecamatan || '',
-            deskripsi: deskripsi,
-            nama: nama,
-            kontak: kontak,
-            kategori: kategori,
-            volume: volume,
-            status: 'belum diproses',
-            sumber: 'Web DLH Bojonegoro'
+        
+        const formData = new URLSearchParams();
+        formData.append('action', 'submit');
+        formData.append('timestamp', timestamp);
+        formData.append('foto', fotoBase64);
+        formData.append('lokasi', lokasi);
+        formData.append('latitude', String(selectedLat));
+        formData.append('longitude', String(selectedLng));
+        formData.append('kecamatan', currentKecamatan || '');
+        formData.append('deskripsi', deskripsiInput.value);
+        formData.append('nama', nama);
+        formData.append('kontak', kontak);
+        formData.append('kategori', kategori);
+        formData.append('volume', volume);
+        formData.append('status', 'belum diproses');
+        formData.append('sumber', 'Web DLH Bojonegoro');
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
         });
-        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
-        showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro! Foto tersimpan di Google Drive.`, 'sukses');
-        resetFormToStep1();
-        setTimeout(() => loadLaporan(), 2000);
-    } catch (error) { console.error('Error:', error); showNotification('Gagal mengirim laporan. Periksa koneksi internet.', 'error'); }
-    finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span>Kirim Laporan</span><i class="fas fa-paper-plane"></i>'; } }
+
+        const result = await response.json();
+        console.log('Response:', result);
+
+        if (result.success) {
+            if (result.fotoUrl && result.fotoUrl !== '') {
+                showNotification('✅ Laporan berhasil dikirim! Foto tersimpan di Google Drive.', 'sukses');
+            } else {
+                showNotification('⚠️ Laporan tersimpan tapi foto gagal diupload.', 'error');
+            }
+            resetFormToStep1();
+            setTimeout(() => loadLaporan(), 2000);
+        } else {
+            showNotification(`❌ Gagal: ${result.error || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Gagal mengirim laporan. Periksa koneksi internet.', 'error');
+    } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<span>Kirim Laporan</span><i class="fas fa-paper-plane"></i>'; }
+    }
 }
 
 async function loadLaporan() {
     const laporanDiv = document.getElementById('laporanList');
-    if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Memuat data laporan dari server DLH...</p></div>';
+    if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Memuat data...</p></div>';
     try {
         const response = await fetch(`${SCRIPT_URL}?action=get`);
         const data = await response.json();
-        if (data && data.data && data.data.length > 0) { allLaporan = data.data.reverse(); updateStats(); renderLaporan(allLaporan); updateMapMarkers(allLaporan); }
-        else { if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-inbox" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i><p>Belum ada laporan. Jadilah yang pertama!</p></div>'; }
-    } catch (error) { console.error('Error loading laporan:', error); if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-wifi" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i><p>Gagal memuat data. Periksa koneksi internet.</p></div>'; }
+        if (data?.data?.length > 0) {
+            allLaporan = data.data.reverse();
+            updateStats();
+            renderLaporan(allLaporan);
+            updateMapMarkers(allLaporan);
+        } else {
+            if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-inbox" style="font-size:3rem;color:#94a3b8"></i><p>Belum ada laporan</p></div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        if (laporanDiv) laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-wifi" style="font-size:3rem;color:#ef4444"></i><p>Gagal memuat data</p></div>';
+    }
 }
 
 function updateStats() {
-    const total = allLaporan.length, selesai = allLaporan.filter(l => l.status === 'selesai').length, proses = allLaporan.filter(l => l.status === 'proses').length;
-    const heroTotal = document.getElementById('heroTotalLaporan'), heroSelesai = document.getElementById('heroSelesai'), heroProses = document.getElementById('heroProses');
-    if (heroTotal) heroTotal.textContent = total; if (heroSelesai) heroSelesai.textContent = selesai; if (heroProses) heroProses.textContent = proses;
-}
-
-function renderLaporan(laporan) {
-    const laporanDiv = document.getElementById('laporanList');
-    if (!laporanDiv) return;
-    if (laporan.length === 0) { laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-search" style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"></i><p>Tidak ada laporan yang sesuai dengan filter</p></div>'; return; }
-    laporanDiv.innerHTML = laporan.map((laporan, index) => { const statusClass = laporan.status === 'selesai' ? 'selesai' : (laporan.status === 'proses' ? 'proses' : 'belum'); return `<div class="laporan-card" data-aos="fade-up" data-aos-delay="${Math.min(index * 50, 500)}"><div class="laporan-header"><div class="laporan-user"><i class="fas fa-user-circle"></i><strong>${escapeHtml(laporan.nama || 'Anonim')}</strong></div><span class="laporan-status status-${statusClass}">${laporan.status === 'belum diproses' ? '⏳ Menunggu Verifikasi' : (laporan.status === 'proses' ? '🔄 Sedang Diproses DLH' : '✅ Selesai')}</span></div><div class="laporan-body"><div class="laporan-lokasi"><i class="fas fa-map-marker-alt"></i><span>📍 ${escapeHtml(laporan.lokasi || 'Lokasi tidak tersedia')}</span></div><div>${laporan.kecamatan ? `<span class="laporan-badge"><i class="fas fa-building"></i> ${escapeHtml(laporan.kecamatan)}</span>` : ''}${laporan.kategori && laporan.kategori !== 'lainnya' ? `<span class="laporan-badge">${getKategoriIcon(laporan.kategori)} ${getKategoriText(laporan.kategori)}</span>` : ''}${laporan.volume && laporan.volume !== 'tidak diketahui' ? `<span class="laporan-badge"><i class="fas fa-truck"></i> ${getVolumeText(laporan.volume)}</span>` : ''}</div><div class="laporan-deskripsi">📝 ${escapeHtml(laporan.deskripsi || 'Tidak ada deskripsi')}</div>${laporan.foto ? `<div class="laporan-foto" onclick="window.openImageModal('${getDriveImgUrl(laporan.foto).replace(/'/g, "\\'")}')"><img src="${getDriveImgUrl(laporan.foto)}" alt="Dokumentasi sampah" loading="lazy" onerror="this.style.display='none'"></div>` : ''}</div><div class="laporan-footer"><span><i class="far fa-calendar-alt"></i> ${laporan.timestamp ? new Date(laporan.timestamp).toLocaleDateString('id-ID') : 'Tanggal tidak tersedia'}</span><span><i class="far fa-clock"></i> ${laporan.timestamp ? new Date(laporan.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-'}</span><span><i class="fas fa-building"></i> DLH Bojonegoro</span></div></div>`; }).join('');
-    if (typeof AOS !== 'undefined') AOS.refresh();
+    const total = allLaporan.length;
+    const selesai = allLaporan.filter(l => l.status === 'selesai').length;
+    const proses = allLaporan.filter(l => l.status === 'proses').length;
+    const heroTotal = document.getElementById('heroTotalLaporan');
+    const heroSelesai = document.getElementById('heroSelesai');
+    const heroProses = document.getElementById('heroProses');
+    if (heroTotal) heroTotal.textContent = total;
+    if (heroSelesai) heroSelesai.textContent = selesai;
+    if (heroProses) heroProses.textContent = proses;
 }
 
 function getDriveImgUrl(input) {
     if (!input) return '';
     if (input.includes('lh3.googleusercontent.com')) return input;
     let fileId = '';
-    const patterns = [/[?&]id=([a-zA-Z0-9_-]+)/, /\/d\/([a-zA-Z0-9_-]+)/, /\/file\/d\/([a-zA-Z0-9_-]+)/, /^([a-zA-Z0-9_-]{25,})$/];
-    for (const re of patterns) { const match = input.match(re); if (match) { fileId = match[1]; break; } }
+    const patterns = [/[?&]id=([a-zA-Z0-9_-]+)/, /\/d\/([a-zA-Z0-9_-]+)/, /\/file\/d\/([a-zA-Z0-9_-]+)/];
+    for (const re of patterns) {
+        const match = input.match(re);
+        if (match) { fileId = match[1]; break; }
+    }
     if (fileId) return `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
     return input;
 }
 
-window.openImageModal = function(imageSrc) {
+function renderLaporan(laporan) {
+    const laporanDiv = document.getElementById('laporanList');
+    if (!laporanDiv) return;
+    if (laporan.length === 0) {
+        laporanDiv.innerHTML = '<div class="loading-state"><i class="fas fa-search" style="font-size:3rem;color:#94a3b8"></i><p>Tidak ada laporan</p></div>';
+        return;
+    }
+    laporanDiv.innerHTML = laporan.map((item, idx) => {
+        const statusClass = item.status === 'selesai' ? 'selesai' : (item.status === 'proses' ? 'proses' : 'belum');
+        const fotoUrl = item.foto ? getDriveImgUrl(item.foto) : '';
+        return `
+        <div class="laporan-card" data-aos="fade-up" data-aos-delay="${Math.min(idx * 50, 500)}">
+            <div class="laporan-header">
+                <div class="laporan-user"><i class="fas fa-user-circle"></i><strong>${escapeHtml(item.nama || 'Anonim')}</strong></div>
+                <span class="laporan-status status-${statusClass}">${item.status === 'belum diproses' ? '⏳ Menunggu' : (item.status === 'proses' ? '🔄 Diproses' : '✅ Selesai')}</span>
+            </div>
+            <div class="laporan-body">
+                <div class="laporan-lokasi"><i class="fas fa-map-marker-alt"></i><span>📍 ${escapeHtml(item.lokasi || 'Tidak tersedia')}</span></div>
+                <div>${item.kecamatan ? `<span class="laporan-badge"><i class="fas fa-building"></i> ${escapeHtml(item.kecamatan)}</span>` : ''}</div>
+                <div class="laporan-deskripsi">📝 ${escapeHtml(item.deskripsi || 'Tidak ada deskripsi')}</div>
+                ${fotoUrl ? `<div class="laporan-foto" onclick="window.openImageModal('${fotoUrl.replace(/'/g, "\\'")}')"><img src="${fotoUrl}" alt="Dokumentasi" loading="lazy" onerror="this.style.display='none'"></div>` : ''}
+            </div>
+            <div class="laporan-footer">
+                <span><i class="far fa-calendar-alt"></i> ${item.timestamp ? new Date(item.timestamp).toLocaleDateString('id-ID') : '-'}</span>
+                <span><i class="fas fa-building"></i> DLH Bojonegoro</span>
+            </div>
+        </div>`;
+    }).join('');
+    if (typeof AOS !== 'undefined') AOS.refresh();
+}
+
+window.openImageModal = function(src) {
     const modal = document.createElement('div');
-    modal.style.cssText = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center; cursor:pointer; animation:fadeIn 0.3s ease;`;
-    modal.innerHTML = `<img src="${imageSrc}" style="max-width:90%; max-height:90%; object-fit:contain; border-radius:16px;"><button style="position:absolute; top:20px; right:20px; background:white; border:none; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:20px;"><i class="fas fa-times"></i></button>`;
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer';
+    modal.innerHTML = `<img src="${src}" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:16px;"><button style="position:absolute;top:20px;right:20px;background:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer"><i class="fas fa-times"></i></button>`;
     modal.onclick = () => modal.remove();
-    const closeBtn = modal.querySelector('button');
-    if (closeBtn) closeBtn.onclick = (e) => { e.stopPropagation(); modal.remove(); };
+    modal.querySelector('button').onclick = (e) => { e.stopPropagation(); modal.remove(); };
     document.body.appendChild(modal);
 };
 
 function filterLaporan() {
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const statusFilter = filterStatus ? filterStatus.value : 'all';
-    const kecamatanFilter = filterKecamatan ? filterKecamatan.value : 'all';
-    const kategoriFilter = filterKategori ? filterKategori.value : 'all';
-    const filtered = allLaporan.filter(laporan => { const matchSearch = (laporan.deskripsi || '').toLowerCase().includes(searchTerm) || (laporan.lokasi || '').toLowerCase().includes(searchTerm) || (laporan.nama || '').toLowerCase().includes(searchTerm); const matchStatus = statusFilter === 'all' || laporan.status === statusFilter; const matchKecamatan = kecamatanFilter === 'all' || (laporan.kecamatan || '').includes(kecamatanFilter); const matchKategori = kategoriFilter === 'all' || laporan.kategori === kategoriFilter; return matchSearch && matchStatus && matchKecamatan && matchKategori; });
+    const search = searchInput?.value.toLowerCase() || '';
+    const status = filterStatus?.value || 'all';
+    const kecamatan = filterKecamatan?.value || 'all';
+    const kategori = filterKategori?.value || 'all';
+    const filtered = allLaporan.filter(l => {
+        const matchSearch = (l.deskripsi || '').toLowerCase().includes(search) || (l.lokasi || '').toLowerCase().includes(search) || (l.nama || '').toLowerCase().includes(search);
+        const matchStatus = status === 'all' || l.status === status;
+        const matchKecamatan = kecamatan === 'all' || (l.kecamatan || '').includes(kecamatan);
+        const matchKategori = kategori === 'all' || l.kategori === kategori;
+        return matchSearch && matchStatus && matchKecamatan && matchKategori;
+    });
     renderLaporan(filtered);
 }
 
-const KATEGORI_ICON_MAP = { 'rumah-tangga': { emoji: '🏠', color: '#f59e0b' }, 'plastik': { emoji: '🪣', color: '#3b82f6' }, 'bangunan': { emoji: '🏗️', color: '#8b5cf6' }, 'b3': { emoji: '⚠️', color: '#ef4444' }, 'medis': { emoji: '🏥', color: '#ec4899' }, 'limbah-pabrik': { emoji: '🏭', color: '#64748b' }, 'lainnya': { emoji: '📦', color: '#10b981' } };
+function getKategoriIcon(k) {
+    const icons = { 'rumah-tangga': '🏠', 'plastik': '🪣', 'bangunan': '🏗️', 'b3': '⚠️', 'medis': '🏥', 'limbah-pabrik': '🏭' };
+    return icons[k] || '📦';
+}
 
-function getKategoriMarkerIcon(kategori, status) { const meta = KATEGORI_ICON_MAP[kategori] || KATEGORI_ICON_MAP['lainnya']; const statusColor = getStatusColor(status); return L.divIcon({ className: '', html: `<div style="position:relative; width:38px; height:38px; display:flex; align-items:center; justify-content:center;"><div style="position:absolute; inset:0; border-radius:50%; background:${statusColor}22; border:2.5px solid ${statusColor}; box-shadow:0 2px 8px ${statusColor}55;"></div><span style="font-size:18px; line-height:1; position:relative; z-index:1;">${meta.emoji}</span></div>`, iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -22] }); }
+function getKategoriText(k) {
+    const texts = { 'rumah-tangga': 'Sampah Rumah Tangga', 'plastik': 'Sampah Plastik', 'bangunan': 'Sampah Bangunan', 'b3': 'Sampah B3', 'medis': 'Sampah Medis', 'limbah-pabrik': 'Limbah Pabrik' };
+    return texts[k] || 'Lainnya';
+}
 
-let userLocationMarker = null, userLocationCircle = null, userLocationWatchId = null;
+function getVolumeText(v) {
+    const texts = { 'kecil': 'Volume Kecil (≤ 1 pick up)', 'sedang': 'Volume Sedang (1-3 pick up)', 'besar': 'Volume Besar (≥ 3 pick up)' };
+    return texts[v] || v;
+}
 
-function startUserLocationOnMap() { if (!navigator.geolocation || !map) return; if (userLocationWatchId !== null) navigator.geolocation.clearWatch(userLocationWatchId); userLocationWatchId = navigator.geolocation.watchPosition((pos) => { const lat = pos.coords.latitude, lng = pos.coords.longitude, acc = pos.coords.accuracy; if (userLocationMarker) { userLocationMarker.setLatLng([lat, lng]); userLocationCircle.setLatLng([lat, lng]); userLocationCircle.setRadius(acc); } else { const pulseIcon = L.divIcon({ className: '', html: `<div style="position:relative;width:20px;height:20px;"><div style="position:absolute;inset:0;border-radius:50%;background:#3b82f633;border:2px solid #3b82f6;animation:userPulse 1.8s ease-out infinite;"></div><div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 6px #3b82f6aa;"></div></div>`, iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -12] }); userLocationMarker = L.marker([lat, lng], { icon: pulseIcon, zIndexOffset: 1000 }).addTo(map).bindPopup('<b><i class="fas fa-location-dot" style="color:#3b82f6"></i> Lokasi Anda</b><br><small>Real-time GPS</small>'); userLocationCircle = L.circle([lat, lng], { radius: acc, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.07, weight: 1, dashArray: '4 4' }).addTo(map); if (!document.getElementById('userPulseStyle')) { const style = document.createElement('style'); style.id = 'userPulseStyle'; style.textContent = `@keyframes userPulse { 0% { transform:scale(1); opacity:.8; } 70% { transform:scale(2.8); opacity:0; } 100% { transform:scale(1); opacity:0; } }`; document.head.appendChild(style); } } }, () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }); }
+function getStatusColor(status) {
+    if (status === 'selesai') return '#10b981';
+    if (status === 'proses') return '#3b82f6';
+    return '#f59e0b';
+}
 
 function updateMapMarkers(laporan) {
     if (!map) return;
-    map.eachLayer(layer => { if (layer instanceof L.Marker && layer !== marker && layer !== userLocationMarker) map.removeLayer(layer); if (layer instanceof L.Circle && layer !== userLocationCircle) map.removeLayer(layer); });
+    map.eachLayer(layer => {
+        if (layer instanceof L.Marker && layer !== marker && layer !== userLocationMarker) map.removeLayer(layer);
+        if (layer instanceof L.Circle && layer !== userLocationCircle) map.removeLayer(layer);
+    });
     if (wilayahPolygons.length === 0) drawWilayahPolygons();
-    laporan.forEach(l => { if (!l.latitude || !l.longitude) return; const lat = parseFloat(l.latitude), lng = parseFloat(l.longitude); L.marker([lat, lng], { icon: getKategoriMarkerIcon(l.kategori, l.status) }).addTo(map).bindPopup(`<div style="min-width:230px;padding:4px;font-family:inherit;"><div style="font-size:15px;font-weight:700;margin-bottom:6px;">${getKategoriIcon(l.kategori)} ${escapeHtml(getKategoriText(l.kategori))}</div><div style="margin-bottom:4px;"><i class="fas fa-user" style="color:#10b981;width:14px;"></i> <b>${escapeHtml(l.nama || 'Anonim')}</b></div>${l.kecamatan ? `<div style="margin-bottom:4px;"><i class="fas fa-map-pin" style="color:#10b981;width:14px;"></i> ${escapeHtml(l.kecamatan)}</div>` : ''}<div style="margin-bottom:6px;color:#475569;font-size:12px;">${escapeHtml((l.deskripsi || '').substring(0, 90))}${(l.deskripsi || '').length > 90 ? '…' : ''}</div><div style="margin-bottom:6px;"><span style="color:${getStatusColor(l.status)}">${l.status === 'belum diproses' ? '⏳ Menunggu Verifikasi' : (l.status === 'proses' ? '🔄 Sedang Diproses' : '✅ Selesai')}</span></div><hr style="margin:6px 0;border-color:#e2e8f0;"><div style="font-size:11px;color:#94a3b8;"><i class="far fa-calendar-alt"></i> ${l.timestamp ? new Date(l.timestamp).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div><a href="#daftar" style="display:block;margin-top:8px;color:#10b981;text-decoration:none;font-weight:600;font-size:12px;"><i class="fas fa-eye"></i> Lihat daftar laporan</a></div>`); });
-    startUserLocationOnMap();
+    
+    laporan.forEach(l => {
+        if (!l.latitude || !l.longitude) return;
+        const lat = parseFloat(l.latitude);
+        const lng = parseFloat(l.longitude);
+        const meta = { 'rumah-tangga': '🏠', 'plastik': '🪣', 'bangunan': '🏗️', 'b3': '⚠️', 'medis': '🏥', 'limbah-pabrik': '🏭' };
+        const icon = L.divIcon({
+            html: `<div style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;"><div style="position:absolute;inset:0;border-radius:50%;background:${getStatusColor(l.status)}22;border:2.5px solid ${getStatusColor(l.status)}"></div><span style="font-size:18px;">${meta[l.kategori] || '📦'}</span></div>`,
+            iconSize: [38, 38],
+            iconAnchor: [19, 19],
+            popupAnchor: [0, -22]
+        });
+        L.marker([lat, lng], { icon }).addTo(map).bindPopup(`
+            <div style="min-width:200px">
+                <strong>${getKategoriText(l.kategori)}</strong><br>
+                <i class="fas fa-user"></i> ${escapeHtml(l.nama || 'Anonim')}<br>
+                ${l.kecamatan ? `<i class="fas fa-map-pin"></i> ${escapeHtml(l.kecamatan)}<br>` : ''}
+                <small>${escapeHtml((l.deskripsi || '').substring(0, 80))}...</small><br>
+                <span style="color:${getStatusColor(l.status)}">${l.status === 'belum diproses' ? '⏳ Menunggu' : (l.status === 'proses' ? '🔄 Diproses' : '✅ Selesai')}</span>
+            </div>
+        `);
+    });
 }
 
-function getStatusColor(status) { switch(status) { case 'selesai': return '#10b981'; case 'proses': return '#3b82f6'; default: return '#f59e0b'; } }
-function getKategoriIcon(kategori) { const icons = { 'rumah-tangga': '🏠', 'plastik': '🪣', 'bangunan': '🏗️', 'b3': '⚠️', 'medis': '🏥', 'limbah-pabrik': '🏭' }; return icons[kategori] || '📦'; }
-function getKategoriText(kategori) { const texts = { 'rumah-tangga': 'Sampah Rumah Tangga', 'plastik': 'Sampah Plastik', 'bangunan': 'Sampah Bangunan', 'b3': 'Sampah B3', 'medis': 'Sampah Medis', 'limbah-pabrik': 'Limbah Pabrik' }; return texts[kategori] || 'Lainnya'; }
-function getVolumeText(volume) { const texts = { 'kecil': 'Volume Kecil (≤ 1 pick up)', 'sedang': 'Volume Sedang (1-3 pick up)', 'besar': 'Volume Besar (≥ 3 pick up)' }; return texts[volume] || volume; }
-
 function setupEventListeners() {
-    const getLocationBtn = document.getElementById('getLocationBtn');
-    if (getLocationBtn) getLocationBtn.addEventListener('click', getCurrentLocation);
-    if (fotoInput) fotoInput.addEventListener('change', previewFoto);
-    if (form) form.addEventListener('submit', submitLaporan);
-    if (deskripsiInput) deskripsiInput.addEventListener('input', updateCharCount);
-    if (searchInput) searchInput.addEventListener('input', filterLaporan);
-    if (filterStatus) filterStatus.addEventListener('change', filterLaporan);
-    if (filterKecamatan) filterKecamatan.addEventListener('change', filterLaporan);
-    if (filterKategori) filterKategori.addEventListener('change', filterLaporan);
-    if (scrollTopBtn) scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    if (navToggle) navToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
-    if (searchInput && searchClear) { searchInput.addEventListener('input', () => { if (searchClear) searchClear.style.display = searchInput.value ? 'flex' : 'none'; }); searchClear.addEventListener('click', () => { if (searchInput) searchInput.value = ''; filterLaporan(); if (searchClear) searchClear.style.display = 'none'; }); }
-    document.querySelectorAll('.nav-link').forEach(link => { link.addEventListener('click', () => { if (navLinks) navLinks.classList.remove('active'); }); });
-    window.addEventListener('scroll', () => { const sections = document.querySelectorAll('section'); const scrollPos = window.scrollY + 100; sections.forEach(section => { const sectionTop = section.offsetTop, sectionBottom = sectionTop + section.offsetHeight, sectionId = section.getAttribute('id'); if (scrollPos >= sectionTop && scrollPos < sectionBottom && sectionId) { document.querySelectorAll('.nav-link').forEach(link => { link.classList.remove('active'); if (link.getAttribute('href') === `#${sectionId}`) link.classList.add('active'); }); } }); });
-    window.addEventListener('resize', () => { if (window.innerWidth > 768 && typeof initCustomCursor === 'function') initCustomCursor(); });
+    document.getElementById('getLocationBtn')?.addEventListener('click', getCurrentLocation);
+    fotoInput?.addEventListener('change', previewFoto);
+    form?.addEventListener('submit', submitLaporan);
+    deskripsiInput?.addEventListener('input', updateCharCount);
+    searchInput?.addEventListener('input', filterLaporan);
+    filterStatus?.addEventListener('change', filterLaporan);
+    filterKecamatan?.addEventListener('change', filterLaporan);
+    filterKategori?.addEventListener('change', filterLaporan);
+    scrollTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    navToggle?.addEventListener('click', () => navLinks?.classList.toggle('active'));
+    if (searchInput && searchClear) {
+        searchInput.addEventListener('input', () => searchClear.style.display = searchInput.value ? 'flex' : 'none');
+        searchClear.addEventListener('click', () => { if (searchInput) searchInput.value = ''; filterLaporan(); searchClear.style.display = 'none'; });
+    }
+    document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', () => navLinks?.classList.remove('active')));
+    window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY + 100;
+        document.querySelectorAll('section').forEach(section => {
+            const id = section.getAttribute('id');
+            if (id && scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${id}`) link.classList.add('active');
+                });
+            }
+        });
+    });
 }
 
 function setupScrollEffect() {
-    window.addEventListener('scroll', () => { if (window.scrollY > 300) { if (scrollTopBtn) scrollTopBtn.classList.add('show'); } else { if (scrollTopBtn) scrollTopBtn.classList.remove('show'); } if (window.scrollY > 50) { if (navbar) navbar.classList.add('scrolled'); } else { if (navbar) navbar.classList.remove('scrolled'); } });
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollTopBtn?.classList.add('show');
+        else scrollTopBtn?.classList.remove('show');
+        if (window.scrollY > 50) navbar?.classList.add('scrolled');
+        else navbar?.classList.remove('scrolled');
+    });
 }
 
-function updateCharCount() { if (deskripsiInput && charCount) { const count = deskripsiInput.value.length; charCount.textContent = count; charCount.style.color = count > 500 ? '#ef4444' : '#64748b'; } }
-function previewFoto(e) { const file = e.target.files[0]; if (file) { if (file.size > 5 * 1024 * 1024) { showNotification('Ukuran foto maksimal 5MB', 'error'); if (fotoInput) fotoInput.value = ''; return; } const reader = new FileReader(); reader.onload = function(e) { const preview = document.getElementById('photoPreview'); if (preview) { preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`; preview.style.display = 'block'; const placeholder = document.querySelector('.photo-placeholder'); if (placeholder) placeholder.style.display = 'none'; } }; reader.readAsDataURL(file); } }
-function showNotification(message, type) { const oldNotif = document.querySelector('.notifikasi'); if (oldNotif) oldNotif.remove(); const notif = document.createElement('div'); notif.className = `notifikasi ${type}`; notif.innerHTML = `<i class="fas ${type === 'sukses' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${escapeHtml(message)}`; document.body.appendChild(notif); setTimeout(() => { notif.style.animation = 'slideOut 0.3s ease'; setTimeout(() => notif.remove(), 300); }, 4000); }
-function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+function updateCharCount() {
+    if (deskripsiInput && charCount) {
+        charCount.textContent = deskripsiInput.value.length;
+        charCount.style.color = deskripsiInput.value.length > 500 ? '#ef4444' : '#64748b';
+    }
+}
+
+function previewFoto(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('Ukuran foto maksimal 5MB', 'error');
+            if (fotoInput) fotoInput.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const preview = document.getElementById('photoPreview');
+            if (preview) {
+                preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                preview.style.display = 'block';
+                const placeholder = document.querySelector('.photo-placeholder');
+                if (placeholder) placeholder.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function showNotification(message, type) {
+    const old = document.querySelector('.notifikasi');
+    if (old) old.remove();
+    const notif = document.createElement('div');
+    notif.className = `notifikasi ${type}`;
+    notif.innerHTML = `<i class="fas ${type === 'sukses' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${escapeHtml(message)}`;
+    document.body.appendChild(notif);
+    setTimeout(() => { notif.style.animation = 'slideOut 0.3s ease'; setTimeout(() => notif.remove(), 300); }, 4000);
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
