@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGdQxw6x9za1H2VmfuEen52neRf-7M7urYjoGKe2TbjAzhwyFtcz0w3zILYNCnU92j/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 // Koordinat berdasarkan batas administrasi resmi (BPS/OSM) Kab. Bojonegoro
