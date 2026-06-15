@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySapFaFQDqD-ETywDNmQ_jcbX8Qz3VSPiNV0HgZk1wrQsf7Cevp3Wgh0NZAq9snSI-/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZGfhCyKL4DsdXI8mLe0GsL3-C5ycbKyCP1nLeA5HrHmXqGR6YePchX5VXxI7i7pOm/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 // Koordinat berdasarkan batas administrasi resmi (BPS/OSM) Kab. Bojonegoro
@@ -747,12 +747,13 @@ function resetFormToStep1() {
     }
 }
 
-// ==================== SUBMIT LAPORAN (VERSI 1 TAHAP - OPSI B) ====================
+// ==================== SUBMIT LAPORAN (VERSI CORS - OPSI 2) ====================
 async function submitLaporan(e) {
     e.preventDefault();
 
     const foto = fotoInput ? fotoInput.files[0] : null;
     
+    // Validasi foto
     if (!foto) {
         showNotification('📸 Harap unggah foto dokumentasi sampah terlebih dahulu', 'error');
         const photoUpload = document.querySelector('.photo-upload');
@@ -766,6 +767,7 @@ async function submitLaporan(e) {
         return;
     }
     
+    // Validasi lokasi
     if (!selectedLat || !selectedLng) {
         showNotification('📍 Harap pilih lokasi kejadian pada peta terlebih dahulu', 'error');
         const mapContainer = document.getElementById('map');
@@ -815,6 +817,7 @@ async function submitLaporan(e) {
         showNotification('📤 Mengompres foto...', 'sukses');
         const fotoBase64 = await compressAndConvertToBase64(foto);
         
+        // Buat data lengkap dalam 1 request
         const requestData = {
             action: 'submit',
             timestamp: timestamp,
@@ -832,17 +835,25 @@ async function submitLaporan(e) {
             sumber: 'Web DLH Bojonegoro'
         };
 
+        // Kirim dengan mode cors (Apps Script sudah support CORS)
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestData)
         });
 
-        showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
-        resetFormToStep1();
-        setTimeout(() => loadLaporan(), 2000);
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification(`✅ Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
+            resetFormToStep1();
+            setTimeout(() => loadLaporan(), 2000);
+        } else {
+            showNotification('Gagal: ' + (result.error || 'Terjadi kesalahan'), 'error');
+        }
 
     } catch (error) {
         console.error('Error:', error);
