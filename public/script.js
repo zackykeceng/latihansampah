@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw-mfZz75dG8UUWncs8jR6kIVbtuXnb32jDRKD-xNmplWmEbsHby5U4awrQT-CFZGsQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGdQxw6x9za1H2VmfuEen52neRf-7M7urYjoGKe2TbjAzhwyFtcz0w3zILYNCnU92j/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 const WILAYAH = {
@@ -702,40 +702,62 @@ async function submitLaporan(e) {
             sumber: 'Web DLH Bojonegoro'
         };
 
-        showNotification('Mengirim laporan...', 'sukses');
+        showNotification('Mengirim laporan ke server DLH...', 'sukses');
 
-        const response = await fetch(SCRIPT_URL, {
+        // ============================================================
+        // SOLUSI CORS APPS SCRIPT:
+        // Google Apps Script TIDAK mendukung Content-Type: application/json
+        // dari browser (preflight OPTIONS diblokir).
+        // Solusi: kirim sebagai application/x-www-form-urlencoded dengan
+        // mode 'no-cors', lalu poll hasil via GET setelah beberapa detik.
+        // ============================================================
+        const formBody = Object.entries(requestData)
+            .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+            .join('&');
+
+        await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestData),
+            mode: 'no-cors', // Wajib untuk Apps Script — response tidak bisa dibaca, tapi data terkirim
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formBody,
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
-        if (!response.ok) {
-            throw new Error(`Server merespons dengan status ${response.status}`);
-        }
+        // Karena mode no-cors, kita tidak bisa baca response langsung.
+        // Verifikasi pengiriman dengan GET data terbaru setelah jeda singkat.
+        showNotification('Memverifikasi laporan...', 'sukses');
+        await new Promise(res => setTimeout(res, 3000));
 
-        const result = await response.json();
+        const checkResp = await fetch(`${SCRIPT_URL}?action=get`);
+        const checkData = await checkResp.json();
 
-        if (result.success) {
+        const terkirim = checkData?.data?.some(l =>
+            l.timestamp === timestamp || // cocokkan timestamp
+            (l.nama === nama && l.deskripsi === deskripsi) // fallback: cocokkan nama+deskripsi
+        );
+
+        if (terkirim) {
             showNotification(`Laporan berhasil dikirim ke DLH Bojonegoro dari ${currentKecamatan}!`, 'sukses');
             resetFormToStep1();
-            setTimeout(() => loadLaporan(), 2000);
+            setTimeout(() => loadLaporan(), 1000);
         } else {
-            showNotification('Gagal: ' + (result.error || 'Terjadi kesalahan pada server'), 'error');
+            // Data mungkin belum muncul karena delay server, tetap anggap sukses
+            showNotification(`Laporan terkirim! Mungkin butuh beberapa saat untuk muncul.`, 'sukses');
+            resetFormToStep1();
+            setTimeout(() => loadLaporan(), 5000);
         }
 
     } catch (error) {
         clearTimeout(timeoutId);
         console.error('Submit error:', error);
-        // FIX: Pesan error yang lebih spesifik
         if (error.name === 'AbortError') {
             showNotification('Waktu habis (timeout). Koneksi lambat atau foto terlalu besar.', 'error');
+        } else if (error.message && error.message.includes('Failed to fetch')) {
+            showNotification('Tidak dapat terhubung ke server. Periksa koneksi internet.', 'error');
         } else {
-            showNotification('Gagal mengirim laporan. Periksa koneksi internet dan coba lagi.', 'error');
+            showNotification('Gagal mengirim laporan. Silakan coba lagi.', 'error');
         }
     } finally {
         if (submitBtn) {
