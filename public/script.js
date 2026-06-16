@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDIOZ-pWkFFkwLWiR3y9Om2cearDFmc4qeueuj44IXcl_bkGDrTAWZKQiBUs8eKacl/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYiyMBb906R7ya1e3npBf5ROAAgTAkoak5Y0x_FzfAZydQpvmG410NMho85cben0Ep/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 const WILAYAH = {
@@ -1052,8 +1052,10 @@ function updateMapMarkers(laporan) {
 
     laporan.forEach(l => {
         if (!l.latitude || !l.longitude) return;
-        const lat = parseFloat(l.latitude);
-        const lng = parseFloat(l.longitude);
+        // FIX: Buang apostrof prefix yang ditambahkan Apps Script agar Sheets
+        // tidak mengubah angka desimal (e.g. "'-7.279546" -> "-7.279546")
+        const lat = parseFloat(String(l.latitude).replace(/^'/, ''));
+        const lng = parseFloat(String(l.longitude).replace(/^'/, ''));
         if (isNaN(lat) || isNaN(lng)) return;
 
         const statusLabel = l.status === 'belum diproses'
