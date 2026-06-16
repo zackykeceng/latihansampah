@@ -1,5 +1,5 @@
 // Konfigurasi Google Sheets (GANTI DENGAN URL DEPLOY APPS SCRIPT ANDA)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ-0HHAlfaBK-sKvfuTkTXgInIGYBpEfZDU1YAp4YbCg-9Yec9P8KuqLQO7jqk8bI/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDIOZ-pWkFFkwLWiR3y9Om2cearDFmc4qeueuj44IXcl_bkGDrTAWZKQiBUs8eKacl/exec';
 
 // ==================== POLIGON WILAYAH KECAMATAN ====================
 const WILAYAH = {
